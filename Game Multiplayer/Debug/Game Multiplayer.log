@@ -1,0 +1,14 @@
+﻿  Game.cpp
+  c:\program files (x86)\microsoft directx sdk (june 2010)\include\dinput.h: DIRECTINPUT_VERSION undefined. Defaulting to version 0x0800
+e:\c++\astar\game ai framework\game multiplayer\astar.h(195): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+e:\c++\astar\game ai framework\game multiplayer\astar.h(196): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+e:\c++\astar\game ai framework\game multiplayer\astar.h(197): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+  GridScene.cpp
+e:\c++\astar\game ai framework\game multiplayer\astar.h(195): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+e:\c++\astar\game ai framework\game multiplayer\astar.h(196): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+e:\c++\astar\game ai framework\game multiplayer\astar.h(197): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+e:\c++\astar\game ai framework\game multiplayer\gridscene.cpp(134): warning C4018: '<': signed/unsigned mismatch
+  Generating Code...
+e:\c++\astar\game ai framework\game multiplayer\astar.h(214): warning C4715: 'AStar::aStar': not all control paths return a value
+e:\c++\astar\game ai framework\game multiplayer\astar.h(96): warning C4715: 'AStar::MakePath': not all control paths return a value
+  Game Multiplayer.vcxproj -> E:\C++\AStar\Game AI Framework\Debug\Client.exe
