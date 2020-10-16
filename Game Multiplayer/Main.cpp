@@ -114,6 +114,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	switch (message)
 	{
 	case WM_DESTROY:
+		GameGlobal::IsGameRunning = false;	
 		PostQuitMessage(0);
 		break;
 
@@ -123,6 +124,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	case WM_KEYUP:
 		SceneManager::Instance()->GetCurrentScene()->OnKeyUp(wParam);
+		break;
+
+	case WM_LBUTTONDOWN:
+		SceneManager::Instance()->GetCurrentScene()->OnLeftMouseDown((float)GET_X_LPARAM(lParam),
+			(float)GET_Y_LPARAM(lParam));
 		break;
 
 	default:

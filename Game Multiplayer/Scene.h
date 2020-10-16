@@ -32,6 +32,11 @@ public:
 		keyboard[_keyCode] = false;
 	}
 
+	virtual void OnLeftMouseDown(float x, float y)
+	{
+
+	}
+
 	D3DCOLOR GetBackcolor()
 	{
 		return backgroundColor;

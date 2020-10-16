@@ -8,6 +8,7 @@
 #include "SpriteList.h"
 #include "GameGlobal.h"
 #include "AStar.h"
+#include "GameLog.h"
 
 class MovingTile : public GridTile
 {		
@@ -26,6 +27,11 @@ public:
 	~GridScene() {}
 	void Update(float dt) override;
 	void Draw() override;
+
+	void OnLeftMouseDown(float x, float y) override
+	{
+		GAMELOG("(%f, %f)", x, y);
+	}
 
 	GridTile begin, destination;
 	std::array<std::array<GridTile*, (HEIGHT / Y_STEP)>, (WIDTH / X_STEP)> map;
