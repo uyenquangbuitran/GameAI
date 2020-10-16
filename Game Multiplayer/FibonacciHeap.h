@@ -209,11 +209,12 @@ private:
 			n = n->next;
 		}
 		HeapNode<T>* min = n;
+		HeapNode<T>* startNode = n;
 		do
 		{
 			if (n->value < min->value) min = n;
 			n = n->next;
-		} while (n != n);
+		} while (n != startNode);
 		return min;
 	}
 
