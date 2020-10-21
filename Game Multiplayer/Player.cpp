@@ -1,4 +1,5 @@
-﻿#include "Player.h"
+﻿#include <math.h>
+#include "Player.h"
 
 #include "GameLog.h"
 #include "SpriteList.h"
@@ -80,6 +81,79 @@ void Player::HandleKeyboard(std::map<int, bool> keys, float _dt)
 		_direction = D_Stand;
 	}
 
+	SetAnimation(_direction);
+	ApplyVelocity();
+}
+
+void Player::Move(D3DXVECTOR2 destination)
+{
+	if (abs(destination.x - Position.x) < 2)
+	{
+		destination.x = round(destination.x);
+		Position.x = destination.x;		
+	}
+
+	if (abs(destination.y - Position.y) < 2)
+	{
+		destination.y = round(destination.y);
+		Position.y = destination.y;
+	}
+		
+	if (destination.x - Position.x < 0)
+	{
+		_direction = D_Left;
+		_isMoving = true;
+	}
+	else if (destination.x - Position.x > 0)
+	{
+		_direction = D_Right;
+		_isMoving = true;
+	}
+	else if (destination.y - Position.y < 0) 
+	{
+		_direction = D_Up;
+		_isMoving = true;
+	}
+	else if (destination.y - Position.y > 0)
+	{
+		_direction = D_Down;
+		_isMoving = true;
+	}
+	else
+	{
+		_direction = D_Stand;
+		_isMoving = false;
+	}
+
+	SetAnimation(_direction);
+	ApplyVelocity();
+}
+
+void Player::Stop(D3DXVECTOR2 preDestination, D3DXVECTOR2 currentDestination)
+{
+	_direction = D_Stand;
+	/*if (abs(currentDestination.x - Position.x) < 2)
+	{
+		currentDestination.x = round(currentDestination.x);
+		Position.x = currentDestination.x;
+	}
+	else
+	{
+		preDestination.x = round(preDestination.x);
+		Position.x = preDestination.x;
+	}
+
+	if (abs(currentDestination.y - Position.y) < 2)
+	{
+		currentDestination.y = round(currentDestination.y);
+		Position.y = currentDestination.y;
+	}
+	else
+	{
+		preDestination.y = round(preDestination.y);
+		Position.y = preDestination.y;
+	}*/
+	_isMoving = false;
 	SetAnimation(_direction);
 	ApplyVelocity();
 }

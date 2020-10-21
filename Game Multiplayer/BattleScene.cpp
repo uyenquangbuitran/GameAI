@@ -1,9 +1,25 @@
 ﻿#include "BattleScene.h"
+#include "AStar.h"
 #include "GameLog.h"
 
 BattleScene::BattleScene()
 {
 	_map = new GameMap("Resource files/map.tmx");
+
+	for (int x = 0; x < (WIDTH / X_STEP); x++)
+	{
+		for (int y = 0; y < (HEIGHT / Y_STEP); y++)
+		{
+			map[x][y] = new GridTile();
+			map[x][y]->SetX(x);
+			map[x][y]->SetY(y);
+			map[x][y]->SetPosition(D3DXVECTOR2((x + 0.5f) * X_STEP, (y + 0.5f) * Y_STEP));
+
+			//Change value of obstacles node.
+			if (obstaclesNode.count(x + y * (WIDTH / X_STEP)))
+				map[x][y]->SetType(Obstacle);
+		}
+	}
 
 	_player = new Player();
 	// tạo 4 bullet cho player
@@ -62,9 +78,15 @@ BattleScene::BattleScene()
 	_waterBrick = new Water(D3DXVECTOR2(10.0f, 10.0f));
 }
 
+void BattleScene::MovePlayer()
+{
+
+}
+
 void BattleScene::Update(float dt)
 {
 	_player->HandleKeyboard(keyboard, dt);
+	//_player->Move();
 
 	for (auto npc : _npcList) // set vận tốc npcs dựa theo direction 
 	{

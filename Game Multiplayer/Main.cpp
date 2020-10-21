@@ -130,7 +130,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		SceneManager::Instance()->GetCurrentScene()->OnLeftMouseDown((float)GET_X_LPARAM(lParam),
 			(float)GET_Y_LPARAM(lParam));
 		break;
-
+	case WM_LBUTTONUP:
+		SceneManager::Instance()->GetCurrentScene()->OnLeftMouseUp((float)GET_X_LPARAM(lParam),
+			(float)GET_Y_LPARAM(lParam));
+		break;
+		
+	case WM_RBUTTONDOWN:
+		SceneManager::Instance()->GetCurrentScene()->OnRightMouseDown((float)GET_X_LPARAM(lParam),
+			(float)GET_Y_LPARAM(lParam));
+	case WM_RBUTTONUP:
+		SceneManager::Instance()->GetCurrentScene()->OnRightMouseUp((float)GET_X_LPARAM(lParam),
+			(float)GET_Y_LPARAM(lParam));
+		break;
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	}

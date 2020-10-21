@@ -11,6 +11,8 @@ class Scene
 protected:
 	D3DCOLOR backgroundColor;
 	std::map<int, bool> keyboard;
+	bool isLeftMouseDown = false;
+	bool isRightMouseDown = false;
 
 public:
 	Scene()
@@ -34,7 +36,22 @@ public:
 
 	virtual void OnLeftMouseDown(float x, float y)
 	{
+		isLeftMouseDown = true;
+	}
 
+	virtual void OnLeftMouseUp(float x, float y)
+	{
+		isLeftMouseDown = false;
+	}
+
+	virtual void OnRightMouseDown(float x, float y)
+	{
+		isRightMouseDown = true;
+	}
+
+	virtual void OnRightMouseUp(float x, float y)
+	{
+		isRightMouseDown = false;
 	}
 
 	D3DCOLOR GetBackcolor()

@@ -9,31 +9,31 @@
 #include "GameGlobal.h"
 #include "AStar.h"
 #include "GameLog.h"
-
-class MovingTile : public GridTile
-{		
-public:
-	bool isAbleToMove = true;
-	MovingTile() : GridTile() { SetType(Moving); x = y = 0; isAbleToMove = true; }
-	void HandleKeyboard(std::map<int, bool> keys);	
-};
+#include "Player.h"
 
 class GridScene : public Scene
 {	
-	MovingTile* movingTile;
-	
+	//MovingTile* movingTile;
+	Player* player;
+	int currentNodeIndex = 0;
+	bool _isPlayerMoving = false;
+	bool _isMouseActive = true;
+	int mode = 1;
+
+	GridTile begin, destination;
+	std::array<std::array<GridTile*, (HEIGHT / Y_STEP)>, (WIDTH / X_STEP)> map;
+	std::vector<GridTile*> path;
+
+	void ResetScene();
+	void RunAStar();
+	void DrawPath();
+	void GivePlayerOrder();
 public:
 	GridScene();
 	~GridScene() {}
 	void Update(float dt) override;
 	void Draw() override;
 
-	void OnLeftMouseDown(float x, float y) override
-	{
-		GAMELOG("(%f, %f)", x, y);
-	}
-
-	GridTile begin, destination;
-	std::array<std::array<GridTile*, (HEIGHT / Y_STEP)>, (WIDTH / X_STEP)> map;
-	std::vector<GridTile*> path;
+	void OnLeftMouseDown(float x, float y) override;
+	void OnRightMouseDown(float x, float  y) override;	
 };

@@ -1,4 +1,8 @@
 #pragma once
+#include <array>
+
+#include "GridTile.h"
+#
 
 #include "Scene.h"
 #include "GameMap.h"
@@ -27,8 +31,11 @@ class BattleScene : public Scene
 	Label _labelCountTime;
 
 	Water* _waterBrick;
-
+	
+	void MovePlayer();
 public:
+	std::array<std::array<GridTile*, (HEIGHT / Y_STEP)>, (WIDTH / X_STEP)> map;
+
 	BattleScene();
 	~BattleScene() {}
 	void Update(float _dt) override;

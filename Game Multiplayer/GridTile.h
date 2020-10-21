@@ -11,6 +11,7 @@ protected:
 	D3DXVECTOR2 position = D3DXVECTOR2(0.f, 0.f);
 	TileType type;
 	D3DCOLOR color;
+	int currentNode = 0;
 	friend class GridScene;
 public:
 	GridTile();

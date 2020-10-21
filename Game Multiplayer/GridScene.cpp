@@ -1,67 +1,10 @@
 #include "GridScene.h"
 #include "SceneManager.h"
 
-void MovingTile::HandleKeyboard(std::map<int, bool> keys)
-{
-	if (!isAbleToMove)
-	{
-		color = D3DCOLOR_XRGB(128, 128, 0);
-		return;
-	}
-	GridScene* scene = dynamic_cast<GridScene*>(SceneManager::Instance()->GetCurrentScene());
-	if (keys[VK_LEFT])
-	{
-		position.x -= X_STEP;
-		x -= 1;
-		isAbleToMove = false;
-	}
-	else if (keys[VK_RIGHT])
-	{
-		position.x += X_STEP;
-		x += 1;
-		isAbleToMove = false;
-	}
-	else if (keys[VK_UP])
-	{
-		position.y -= X_STEP;
-		y -= 1;	
-		isAbleToMove = false;
-	}
-	else if (keys[VK_DOWN])
-	{
-		position.y += X_STEP;
-		y += 1;
-		isAbleToMove = false;
-	}
-	else if (keys[0x41]) // A
-	{		
-		scene->map[scene->begin.GetX()][scene->begin.GetY()]->SetType(Empty);
-		scene->begin.SetX(x);
-		scene->begin.SetY(y);
-		scene->map[x][y]->SetType(Begin);
-		isAbleToMove = false;
-	}
-	else if (keys[0x53]) // S
-	{
-		scene->map[scene->destination.GetX()][scene->destination.GetY()]->SetType(Empty);
-		scene->destination.SetX(x);
-		scene->destination.SetY(y);
-		scene->map[x][y]->SetType(Destination);
-		isAbleToMove = false;
-	}
-	else if (keys[0x44]) // D
-	{
-		int id = x + y * (WIDTH / X_STEP);
-		obstaclesNode.insert(id);
-		scene->map[x][y]->SetType(Obstacle);
-		isAbleToMove = false;
-	}
-}
-
 GridScene::GridScene()
 {
-	movingTile = new MovingTile();
-	movingTile->SetPosition(D3DXVECTOR2(25.f, 25.f));
+	player = new Player();
+	player->Position = D3DXVECTOR2(25.f, 25.f);
 
 	begin = GridTile();
 	begin.SetPosition(D3DXVECTOR2(0.f, 0.f));	
@@ -93,48 +36,223 @@ GridScene::GridScene()
 
 void GridScene::Update(float dt)
 {
-	movingTile->HandleKeyboard(keyboard);
-	if (keyboard[0x46]) // F
+	if (keyboard[0x31]) // 1 -> normal mode, right click to set destination.
 	{
-		movingTile->isAbleToMove = true;
-		movingTile->color = D3DCOLOR_XRGB(255, 255, 0);
+		mode = 1;
+		GAMELOG("Mode: %d", mode);
+		keyboard[0x31] = false;
+	}
+	else if (keyboard[0x32]) // 2 -> auto mode, right click will auto find path and move tank to destination.
+	{
+		mode = 2;
+		GAMELOG("Mode: %d", mode);
+		keyboard[0x32] = false;
+	}
+	else if (keyboard[0x33]) // 3 -> editor mode, left click will set obstacle, right click will remove obstacle.
+	{
+		mode = 3;
+		GAMELOG("Mode: %d", mode);
+		keyboard[0x33] = false;
+	}
+
+	if (keyboard[0x51]) // Q
+	{
+		RunAStar();		
+		keyboard[0x51] = false;
+	}
+	else if (keyboard[0x57]) // W
+	{
+		DrawPath();
+		keyboard[0x57] = false;
+	}
+	else if (keyboard[0x45]) // E
+	{
+		// Move player.
+		_isPlayerMoving = true;		
+		keyboard[0x45] = false;
 	}
 	else if (keyboard[0x52]) // R
 	{
+		ResetScene();
+	}
+	else if (keyboard[0x54]) // T
+	{
+		obstaclesNode.clear();
 		for (int x = 0; x < (WIDTH / X_STEP); x++)
 		{
 			for (int y = 0; y < (HEIGHT / Y_STEP); y++)
 			{
-				map[x][y]->SetType(Empty);
+				if (map[x][y]->type == Obstacle)
+					map[x][y]->SetType(Empty);
 			}
 		}
-		obstaclesNode.clear();
-		path.clear();
+		keyboard[0x54] = false;
 	}
-	else if (keyboard[0x45]) // E
+	else if (keyboard[0x46]) // F
 	{
-		path.clear();
-		Node beginNode;
-		//Setting position for begin node.
-		beginNode.SetX(begin.GetX());
-		beginNode.SetY(begin.GetY());
+		_isMouseActive = !_isMouseActive;
+		if (_isMouseActive)
+			GAMELOG("Mouse is actived!");
+		else
+			GAMELOG("Mouse is deactived!");
+		keyboard[0x46] = false;
+	}	
+	
+	GivePlayerOrder();
+	player->Update(dt);
+}
 
-		Node destNode;
-		destNode.SetX(destination.GetX());
-		destNode.SetY(destination.GetY());
-		std::vector<Node> result = AStar::aStar(beginNode, destNode, map);
-		for (std::vector<Node>::iterator it = result.begin(); it != result.end(); it = std::next(it))
+void GridScene::OnLeftMouseDown(float x, float y)
+{
+	if (!_isMouseActive) return;
+
+	if (mode != 3)
+	{
+		GAMELOG("(%d, %d)", ((int(x)) / 50), ((int(y)) / 50));
+	}
+	else
+	{
+		int _x = int(x) / 50, _y = int(y) / 50;
+		int id = _x + _y * (WIDTH / X_STEP);
+		obstaclesNode.insert(id);
+		map[_x][_y]->SetType(Obstacle);
+	}
+}
+
+void GridScene::OnRightMouseDown(float x, float y)
+{
+	if (!_isMouseActive) return;
+
+	switch (mode)
+	{
+	case 1:
+		map[begin.GetX()][begin.GetY()]->SetType(Empty);
+		begin.SetPosition(player->Position);
+		begin.x = begin.position.x / 50;
+		begin.y = begin.position.y / 50;
+		map[begin.x][begin.y]->SetType(Begin);
+
+		map[destination.GetX()][destination.GetY()]->SetType(Empty);
+		destination.SetPosition(D3DXVECTOR2(x, y));
+		destination.x = int(x) / 50;
+		destination.y = int(y) / 50;
+		map[destination.x][destination.y]->SetType(Destination);
+		break;
+
+	case 2:		
+		if (!_isPlayerMoving)
 		{
-			path.push_back(map[it->GetX()][it->GetY()]);
+			ResetScene();
+			map[begin.GetX()][begin.GetY()]->SetType(Empty);
+			begin.SetPosition(player->Position);
+			begin.x = begin.position.x / 50;
+			begin.y = begin.position.y / 50;
+			map[begin.x][begin.y]->SetType(Begin);
+
+			map[destination.GetX()][destination.GetY()]->SetType(Empty);
+			destination.SetPosition(D3DXVECTOR2(x, y));
+			destination.x = int(x) / 50;
+			destination.y = int(y) / 50;
+			map[destination.x][destination.y]->SetType(Destination);
+
+			RunAStar();
+			DrawPath();
+			_isPlayerMoving = true;
+		}
+		else
+		{
+			if (currentNodeIndex > 0)
+				player->Stop(path[currentNodeIndex-1]->position, path[currentNodeIndex]->position);
+			else
+				player->Stop(path[currentNodeIndex]->position, path[currentNodeIndex]->position);
+			_isPlayerMoving = false;
+
+			ResetScene();
+			map[begin.GetX()][begin.GetY()]->SetType(Empty);
+			begin.SetPosition(player->Position);
+			begin.x = begin.position.x / 50;
+			begin.y = begin.position.y / 50;
+			map[begin.x][begin.y]->SetType(Begin);
+
+			map[destination.GetX()][destination.GetY()]->SetType(Empty);
+			destination.SetPosition(D3DXVECTOR2(x, y));
+			destination.x = int(x) / 50;
+			destination.y = int(y) / 50;
+			map[destination.x][destination.y]->SetType(Destination);
+
+			RunAStar();
+			DrawPath();
+			_isPlayerMoving = true;
+		}
+		break;
+
+	case 3:
+		int _x = int(x) / 50, _y = int(y) / 50;
+		int id = _x + _y * (WIDTH / X_STEP);
+		obstaclesNode.erase(id);
+		map[_x][_y]->SetType(Empty);
+		break;
+	}
+}
+
+void GridScene::ResetScene()
+{
+	for (int x = 0; x < (WIDTH / X_STEP); x++)
+	{
+		for (int y = 0; y < (HEIGHT / Y_STEP); y++)
+		{
+			if (map[x][y]->type != Obstacle)
+				map[x][y]->SetType(Empty);
+			else
+				map[x][y]->SetType(Obstacle);
 		}
 	}
-	else if (keyboard[0x51])
+	path.clear();
+}
+
+void GridScene::RunAStar()
+{
+	path.clear();
+	Node beginNode;
+	//Setting position for begin node.
+	beginNode.SetX(begin.GetX());
+	beginNode.SetY(begin.GetY());
+
+	Node destNode;
+	destNode.SetX(destination.GetX());
+	destNode.SetY(destination.GetY());
+	std::vector<Node> result = AStar::aStar(beginNode, destNode, map);
+	for (std::vector<Node>::iterator it = result.begin(); it != result.end(); it = std::next(it))
 	{
-		if (!path.empty())
-			for (int index = 0; index < path.size(); index++)
-			{
-				path[index]->SetType(Path);
-			}
+		path.push_back(map[it->GetX()][it->GetY()]);
+	}
+}
+
+void GridScene::DrawPath()
+{
+	if (!path.empty())
+		for (int index = 0; index < path.size(); index++)
+		{
+			path[index]->SetType(Path);
+		}
+	else
+		GAMELOG("Path is empty!");
+}
+
+void GridScene::GivePlayerOrder()
+{
+	if (_isPlayerMoving)
+	{
+		if (currentNodeIndex < path.size())
+		{
+			player->Move(path[currentNodeIndex]->position);
+			if (!player->IsMoving()) currentNodeIndex++;
+		}
+		else
+		{
+			currentNodeIndex = 0;
+			_isPlayerMoving = false;
+		}
 	}
 }
 
@@ -147,6 +265,6 @@ void GridScene::Draw()
 			map[x][y]->Draw();
 		}
 	}
-
-	movingTile->Draw();
+	
+	player->Draw();
 }

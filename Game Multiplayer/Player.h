@@ -21,6 +21,7 @@ class Player : public Entity
 	const float _time_BetweenShoots = 0.7f;
 	float _count_Shoot = 0.0f;
 
+	bool _isMoving = false;
 
 	std::vector<Explosion*> _explosionList; // trỏ đến
 
@@ -44,8 +45,7 @@ class Player : public Entity
 
 	void SetAnimation(Direction _dir);
 	void InitAnimation();
-	void LogPosition() { GAMELOG("(%i, %i)", (int)Position.x, (int)Position.y); }
-
+	void LogPosition() { GAMELOG("(%i, %i)", (int)Position.x, (int)Position.y); }	
 public:
 	Player();
 	~Player() {}
@@ -57,4 +57,8 @@ public:
 	void ApplyVelocity(); // vận tốc theo direction
 	void addExplosion(Explosion* e) { _explosionList.push_back(e); }
 	int getScore() { return _score; }
+
+	bool IsMoving() { return _isMoving; }
+	void Move(D3DXVECTOR2 destination);
+	void Stop(D3DXVECTOR2 preDestination, D3DXVECTOR2 currentDestination);
 };
