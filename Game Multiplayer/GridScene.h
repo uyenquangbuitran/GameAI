@@ -23,6 +23,7 @@ class GridScene : public Scene
 	GridTile begin, destination;
 	std::array<std::array<GridTile*, (HEIGHT / Y_STEP)>, (WIDTH / X_STEP)> map;
 	std::vector<GridTile*> path;
+	std::vector<GridTile*> drawPath;
 
 	void ResetScene();
 	void RunAStar();

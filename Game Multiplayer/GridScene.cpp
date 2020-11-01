@@ -1,5 +1,6 @@
 #include "GridScene.h"
 #include "SceneManager.h"
+#include <math.h>
 
 GridScene::GridScene()
 {
@@ -26,6 +27,24 @@ GridScene::GridScene()
 			map[x][y]->x = x;
 			map[x][y]->y = y;
 			map[x][y]->position = D3DXVECTOR2((x + 0.5f) * X_STEP, (y + 0.5f) * Y_STEP);
+
+			/*
+			int id = x + y * (WIDTH / X_STEP);
+			if (id % 2 == 0)
+			{
+				if (y % 2 == 0)
+					map[x][y]->SetType(Debug0);
+				else
+					map[x][y]->SetType(Debug1);
+			}
+			else
+			{
+				if (y % 2 == 0)
+					map[x][y]->SetType(Debug1);
+				else
+					map[x][y]->SetType(Debug0);
+			}
+			*/
 
 			//Change value of obstacles node.
 			if (obstaclesNode.count(x + y * (WIDTH / X_STEP)))
@@ -108,14 +127,16 @@ void GridScene::OnLeftMouseDown(float x, float y)
 
 	if (mode != 3)
 	{
-		GAMELOG("(%d, %d)", ((int(x)) / 50), ((int(y)) / 50));
+		GAMELOG("(%d, %d)", int(x / float(X_STEP)), int(y / float(Y_STEP)));
 	}
 	else
 	{
-		int _x = int(x) / 50, _y = int(y) / 50;
+		int _x = int(x / float(X_STEP)), _y = int(y / float(Y_STEP));
 		int id = _x + _y * (WIDTH / X_STEP);
 		obstaclesNode.insert(id);
 		map[_x][_y]->SetType(Obstacle);
+		GAMELOG("%f, %f", x, y);
+		GAMELOG("(%d, %d)", _x, _y);
 	}
 }
 
@@ -128,14 +149,14 @@ void GridScene::OnRightMouseDown(float x, float y)
 	case 1:
 		map[begin.GetX()][begin.GetY()]->SetType(Empty);
 		begin.SetPosition(player->Position);
-		begin.x = begin.position.x / 50;
-		begin.y = begin.position.y / 50;
+		begin.x = int(begin.position.x / float(X_STEP));
+		begin.y = int(begin.position.y / float(Y_STEP));
 		map[begin.x][begin.y]->SetType(Begin);
 
 		map[destination.GetX()][destination.GetY()]->SetType(Empty);
 		destination.SetPosition(D3DXVECTOR2(x, y));
-		destination.x = int(x) / 50;
-		destination.y = int(y) / 50;
+		destination.x = int(x / float(X_STEP));
+		destination.y = int(y / float(Y_STEP));
 		map[destination.x][destination.y]->SetType(Destination);
 		break;
 
@@ -145,14 +166,14 @@ void GridScene::OnRightMouseDown(float x, float y)
 			ResetScene();
 			map[begin.GetX()][begin.GetY()]->SetType(Empty);
 			begin.SetPosition(player->Position);
-			begin.x = begin.position.x / 50;
-			begin.y = begin.position.y / 50;
+			begin.x = int(begin.position.x / float(X_STEP));
+			begin.y = int(begin.position.y / float(Y_STEP));
 			map[begin.x][begin.y]->SetType(Begin);
 
 			map[destination.GetX()][destination.GetY()]->SetType(Empty);
 			destination.SetPosition(D3DXVECTOR2(x, y));
-			destination.x = int(x) / 50;
-			destination.y = int(y) / 50;
+			destination.x = int(x / float(X_STEP));
+			destination.y = int(y / float(Y_STEP));
 			map[destination.x][destination.y]->SetType(Destination);
 
 			RunAStar();
@@ -166,18 +187,19 @@ void GridScene::OnRightMouseDown(float x, float y)
 			else
 				player->Stop(path[currentNodeIndex]->position, path[currentNodeIndex]->position);
 			_isPlayerMoving = false;
+			currentNodeIndex = 0;
 
 			ResetScene();
 			map[begin.GetX()][begin.GetY()]->SetType(Empty);
 			begin.SetPosition(player->Position);
-			begin.x = begin.position.x / 50;
-			begin.y = begin.position.y / 50;
+			begin.x = int(begin.position.x / float(X_STEP));
+			begin.y = int(begin.position.y / float(Y_STEP));
 			map[begin.x][begin.y]->SetType(Begin);
 
 			map[destination.GetX()][destination.GetY()]->SetType(Empty);
 			destination.SetPosition(D3DXVECTOR2(x, y));
-			destination.x = int(x) / 50;
-			destination.y = int(y) / 50;
+			destination.x = int(x / float(X_STEP));
+			destination.y = int(y / float(Y_STEP));
 			map[destination.x][destination.y]->SetType(Destination);
 
 			RunAStar();
@@ -187,11 +209,13 @@ void GridScene::OnRightMouseDown(float x, float y)
 		break;
 
 	case 3:
-		int _x = int(x) / 50, _y = int(y) / 50;
+		int _x = int(x / float(X_STEP)), _y = int(y / float(Y_STEP));
 		int id = _x + _y * (WIDTH / X_STEP);
 		obstaclesNode.erase(id);
 		map[_x][_y]->SetType(Empty);
-		break;
+		GAMELOG("%f, %f", x, y);
+		GAMELOG("(%d, %d)", int(x / float(X_STEP)), int(y / float(Y_STEP)));
+		break;		
 	}
 }
 
@@ -205,9 +229,27 @@ void GridScene::ResetScene()
 				map[x][y]->SetType(Empty);
 			else
 				map[x][y]->SetType(Obstacle);
+			/*
+			int id = x + y * (WIDTH / X_STEP);
+			if (id % 2 == 0)
+			{
+				if (y % 2 == 0)
+					map[x][y]->SetType(Debug0);
+				else
+					map[x][y]->SetType(Debug1);
+			}
+			else
+			{
+				if (y % 2 == 0)
+					map[x][y]->SetType(Debug1);
+				else
+					map[x][y]->SetType(Debug0);
+			}
+			*/
 		}
 	}
 	path.clear();
+	drawPath.clear();
 }
 
 void GridScene::RunAStar()
@@ -233,7 +275,10 @@ void GridScene::DrawPath()
 	if (!path.empty())
 		for (int index = 0; index < path.size(); index++)
 		{
-			path[index]->SetType(Path);
+			//path[index]->SetType(Path);
+			GridTile* tile = path[index];
+			drawPath.emplace_back(tile);
+			drawPath[index]->SetType(Path);
 		}
 	else
 		GAMELOG("Path is empty!");
@@ -265,6 +310,9 @@ void GridScene::Draw()
 			map[x][y]->Draw();
 		}
 	}
-	
+	for (int index = 0; index < drawPath.size(); index++)
+	{		
+		drawPath[index]->Draw();
+	}
 	player->Draw();
 }

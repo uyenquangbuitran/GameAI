@@ -99,22 +99,22 @@ void Player::Move(D3DXVECTOR2 destination)
 		Position.y = destination.y;
 	}
 		
-	if (destination.x - Position.x < 0)
+	if (destination.x - Position.x < -0.5f)
 	{
 		_direction = D_Left;
 		_isMoving = true;
 	}
-	else if (destination.x - Position.x > 0)
+	else if (destination.x - Position.x > 0.5f)
 	{
 		_direction = D_Right;
 		_isMoving = true;
 	}
-	else if (destination.y - Position.y < 0) 
+	else if (destination.y - Position.y < -0.5f) 
 	{
 		_direction = D_Up;
 		_isMoving = true;
 	}
-	else if (destination.y - Position.y > 0)
+	else if (destination.y - Position.y > 0.5f)
 	{
 		_direction = D_Down;
 		_isMoving = true;

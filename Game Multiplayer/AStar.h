@@ -171,7 +171,7 @@ public:
 					double gNew, hNew, fNew;
 					if (IsValid(x + newX, y + newY))
 					{
-						if (IsDestination(x + newX, y + newY, dest))
+						if (IsDestination(x + newX, y + newY, dest) && (newX == 0 || newY == 0))
 						{
 							//Destination found - make path.
 							allMap[x + newX][y + newY].parentX = x;

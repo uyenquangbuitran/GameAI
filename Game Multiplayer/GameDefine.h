@@ -42,5 +42,7 @@ enum TileType
 	Moving,
 	Begin,
 	Destination,
-	Path
+	Path,
+	Debug0,
+	Debug1
 };

@@ -15,6 +15,7 @@ protected:
 	friend class GridScene;
 public:
 	GridTile();
+	GridTile(const GridTile&tile);
 	~GridTile() {};
 	void SetX(int x) { this->x = x; }
 	void SetY(int y) { this->y = y; }
