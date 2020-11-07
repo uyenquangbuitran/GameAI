@@ -2,6 +2,7 @@
 #include <d3dx9.h>
 #include <d3d9.h>
 #include <vector>
+#include <set>
 
 #include "Sprite.h"	
 #include "MapReader\Tmx.h.in"
@@ -30,6 +31,8 @@ class GameMap
 	int getTileHeight() { return _map->GetTileHeight(); }
 
 public:
+	std::set<int, std::greater <int>> obstaclesNode;
+
 	GameMap(char* filePath);
 	~GameMap() {}
 	void Draw();

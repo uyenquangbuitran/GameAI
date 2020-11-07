@@ -5,13 +5,14 @@
 #include "GameLog.h"
 //#include "BattleScene.h"
 #include "GridScene.h"
+#include "HorizontalFieldScene.h"
 #include <stdio.h>
 
 Game::Game()
 {
 	//SceneManager::Instance()->ReplaceScene(new BattleScene());
-	SceneManager::Instance()->ReplaceScene(new GridScene());
-
+	//SceneManager::Instance()->ReplaceScene(new GridScene());
+	SceneManager::Instance()->ReplaceScene(new HorizontalFieldScene());
 	InitLoop();
 }
 

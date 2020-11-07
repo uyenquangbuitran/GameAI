@@ -13,6 +13,7 @@ protected:
 	D3DCOLOR color;
 	int currentNode = 0;
 	friend class GridScene;
+	friend class HorizontalFieldScene;
 public:
 	GridTile();
 	GridTile(const GridTile&tile);

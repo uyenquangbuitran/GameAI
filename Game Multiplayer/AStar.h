@@ -21,9 +21,9 @@ Apply to game.
 static std::set<int, std::greater <int>> obstaclesNode;
 
 class AStar
-{
+{	
 public:
-	static void AddObstacle(int x, int y)
+	/*static void AddObstacle(int x, int y)
 	{
 		int id = x + y * (WIDTH / X_STEP);
 		obstaclesNode.insert(id);
@@ -32,10 +32,17 @@ public:
 	static void AddObstacle(int id)
 	{
 		obstaclesNode.insert(id);
+	}*/
+
+	void setObstaclesNode(std::set<int, std::greater <int>> value)
+	{
+		obstaclesNode = value;
 	}
 
 	static bool IsValid(int x, int y)
 	{
+		if (x == 0 && y == 0)
+			std::cout << "ERROR!" << std::endl;
 		int id = x + y * (WIDTH / X_STEP);
 
 		if (!obstaclesNode.count(id))
@@ -44,7 +51,7 @@ public:
 				return false;
 
 			return true;
-		}
+		}		
 		return false;
 	}
 

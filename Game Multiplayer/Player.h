@@ -6,6 +6,7 @@
 #include <vector>
 #include "GameLog.h"
 #include "GameDefine.h"
+#include "GridTile.h"
 
 using namespace std;
 
@@ -41,7 +42,7 @@ class Player : public Entity
 
 	Animation* _arrowAnimation; // animation mũi tên ở trên người chơi
 	Animation* _shieldAnimation; // animation khiên 
-	Animation* _spawnAnimation; // animation hồi sinh
+	Animation* _spawnAnimation; // animation hồi sinh	
 
 	void SetAnimation(Direction _dir);
 	void InitAnimation();
@@ -56,9 +57,11 @@ public:
 	void HandleKeyboard(std::map<int, bool> _keys, float _dt);
 	void ApplyVelocity(); // vận tốc theo direction
 	void addExplosion(Explosion* e) { _explosionList.push_back(e); }
-	int getScore() { return _score; }
+	
+	int getScore() { return _score; }	
+	std::vector<GridTile*> path;
 
 	bool IsMoving() { return _isMoving; }
 	void Move(D3DXVECTOR2 destination);
-	void Stop(D3DXVECTOR2 preDestination, D3DXVECTOR2 currentDestination);
+	void Stop();
 };

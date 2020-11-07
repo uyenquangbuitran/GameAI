@@ -1,5 +1,6 @@
 ﻿#include "GameMap.h"
 #include "GameLog.h"
+#include "AStar.h"
 
 GameMap::GameMap(char* filePath)
 {
@@ -53,18 +54,34 @@ void GameMap::LoadMap(char* filePath)
 							{
 								brick = new BrickNormal(pos);
 								_brickNorList.push_back((BrickNormal*)brick);
+
+								int _x = int(pos.x / float(X_STEP)), _y = int(pos.y / float(Y_STEP));
+								int id = _x + _y * (WIDTH / X_STEP);
+								obstaclesNode.insert(id);
 							}
 							else if (layer->GetName() == "Metal Brick")
 							{
 								brick = new MetalBrick(pos);
+
+								int _x = int(pos.x / float(X_STEP)), _y = int(pos.y / float(Y_STEP));
+								int id = _x + _y * (WIDTH / X_STEP);
+								obstaclesNode.insert(id);
 							}
 							else if (layer->GetName() == "Water")
 							{
 								brick = new Water(pos);
+
+								int _x = int(pos.x / float(X_STEP)), _y = int(pos.y / float(Y_STEP));
+								int id = _x + _y * (WIDTH / X_STEP);
+								obstaclesNode.insert(id);
 							}
 							else if (layer->GetName() == "Tile Layer 1")
 							{
 								brick = new Boundary(pos);
+
+								int _x = int(pos.x / float(X_STEP)), _y = int(pos.y / float(Y_STEP));
+								int id = _x + _y * (WIDTH / X_STEP);
+								obstaclesNode.insert(id);
 							}
 
 							_brickList.push_back(brick);

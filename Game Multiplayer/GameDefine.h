@@ -2,10 +2,10 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-#define WIDTH 1200
-#define HEIGHT 650
-#define X_STEP 50
-#define Y_STEP 50
+#define WIDTH 960
+#define HEIGHT 480
+#define X_STEP 32
+#define Y_STEP 32
 
 // [0, 10] => 4 bit
 enum EntityType

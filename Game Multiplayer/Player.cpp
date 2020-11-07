@@ -129,30 +129,9 @@ void Player::Move(D3DXVECTOR2 destination)
 	ApplyVelocity();
 }
 
-void Player::Stop(D3DXVECTOR2 preDestination, D3DXVECTOR2 currentDestination)
+void Player::Stop()
 {
 	_direction = D_Stand;
-	/*if (abs(currentDestination.x - Position.x) < 2)
-	{
-		currentDestination.x = round(currentDestination.x);
-		Position.x = currentDestination.x;
-	}
-	else
-	{
-		preDestination.x = round(preDestination.x);
-		Position.x = preDestination.x;
-	}
-
-	if (abs(currentDestination.y - Position.y) < 2)
-	{
-		currentDestination.y = round(currentDestination.y);
-		Position.y = currentDestination.y;
-	}
-	else
-	{
-		preDestination.y = round(preDestination.y);
-		Position.y = preDestination.y;
-	}*/
 	_isMoving = false;
 	SetAnimation(_direction);
 	ApplyVelocity();
