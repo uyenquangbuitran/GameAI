@@ -199,6 +199,9 @@
     <ClInclude Include="GridTile.h">
       <Filter>Astar</Filter>
     </ClInclude>
+    <ClInclude Include="HorizontalFieldScene.h">
+      <Filter>Scenes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="MapReader\Tmx.h.in">
@@ -326,6 +329,9 @@
     </ClCompile>
     <ClCompile Include="GraphNode.cpp">
       <Filter>Astar</Filter>
+    </ClCompile>
+    <ClCompile Include="HorizontalFieldScene.cpp">
+      <Filter>Scenes</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
