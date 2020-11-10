@@ -21,8 +21,11 @@ class Player : public Entity
 
 	const float _time_BetweenShoots = 0.7f;
 	float _count_Shoot = 0.0f;
+	float onPauseTime = 0.f;
+	float pauseTime = 0.f;
 
 	bool _isMoving = false;
+	bool _isPausing = false;
 
 	std::vector<Explosion*> _explosionList; // trỏ đến
 
@@ -62,6 +65,9 @@ public:
 	std::vector<GridTile*> path;
 
 	bool IsMoving() { return _isMoving; }
+	bool IsPause() { return _isPausing; }
+
 	void Move(D3DXVECTOR2 destination);
 	void Stop();
+	void Pause(float delayAmount = 0.15f);
 };

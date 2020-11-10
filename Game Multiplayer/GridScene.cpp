@@ -48,8 +48,8 @@ GridScene::GridScene()
 			*/
 
 			//Change value of obstacles node.
-			if (obstaclesNode.count(x + y * (WIDTH / X_STEP)))
-				map[x][y]->SetType(Obstacle);
+			/*if (obstaclesNode.count(x + y * (WIDTH / X_STEP)))
+				map[x][y]->SetType(Obstacle);*/
 		}
 	}
 }
@@ -97,7 +97,7 @@ void GridScene::Update(float dt)
 	}
 	else if (keyboard[0x54]) // T
 	{
-		obstaclesNode.clear();
+		//obstaclesNode.clear();
 		for (int x = 0; x < (WIDTH / X_STEP); x++)
 		{
 			for (int y = 0; y < (HEIGHT / Y_STEP); y++)
@@ -134,7 +134,7 @@ void GridScene::OnLeftMouseDown(float x, float y)
 	{
 		int _x = int(x / float(X_STEP)), _y = int(y / float(Y_STEP));
 		int id = _x + _y * (WIDTH / X_STEP);
-		obstaclesNode.insert(id);
+		//obstaclesNode.insert(id);
 		map[_x][_y]->SetType(Obstacle);
 		GAMELOG("%f, %f", x, y);
 		GAMELOG("(%d, %d)", _x, _y);
@@ -229,7 +229,7 @@ void GridScene::OnRightMouseDown(float x, float y)
 	case 3:
 		int _x = int(x / float(X_STEP)), _y = int(y / float(Y_STEP));
 		int id = _x + _y * (WIDTH / X_STEP);
-		obstaclesNode.erase(id);
+		//obstaclesNode.erase(id);
 		map[_x][_y]->SetType(Empty);
 		GAMELOG("%f, %f", x, y);
 		GAMELOG("(%d, %d)", int(x / float(X_STEP)), int(y / float(Y_STEP)));
@@ -281,11 +281,11 @@ void GridScene::RunAStar()
 	Node destNode;
 	destNode.SetX(destination.GetX());
 	destNode.SetY(destination.GetY());
-	std::vector<Node> result = AStar::aStar(beginNode, destNode, map);
+	/*std::vector<Node> result = AStar::aStar(beginNode, destNode, map);
  	for (std::vector<Node>::iterator it = result.begin(); it != result.end(); it = std::next(it))
 	{
 		player->path.push_back(map[it->GetX()][it->GetY()]);
-	}	
+	}	*/
 }
 
 void GridScene::DrawPath()

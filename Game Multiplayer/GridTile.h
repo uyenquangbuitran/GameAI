@@ -25,4 +25,5 @@ public:
 	void Draw();
 	void SetType(TileType type);
 	void SetPosition(D3DXVECTOR2 position) { this->position = position; }
+	D3DXVECTOR2 GetPosition() { return position; }
 };

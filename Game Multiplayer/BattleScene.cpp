@@ -15,9 +15,7 @@ BattleScene::BattleScene()
 			map[x][y]->SetY(y);
 			map[x][y]->SetPosition(D3DXVECTOR2((x + 0.5f) * X_STEP, (y + 0.5f) * Y_STEP));
 
-			//Change value of obstacles node.
-			if (obstaclesNode.count(x + y * (WIDTH / X_STEP)))
-				map[x][y]->SetType(Obstacle);
+			
 		}
 	}
 

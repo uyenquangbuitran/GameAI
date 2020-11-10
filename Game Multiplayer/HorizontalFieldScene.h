@@ -8,6 +8,7 @@
 #include "SpriteList.h"
 #include "GameGlobal.h"
 #include "GameLog.h"
+#include "GraphNode.h"
 
 #include "Player.h"
 #include "NPC.h"
@@ -20,7 +21,7 @@ class HorizontalFieldScene : public Scene
 {	
 	GameMap* _map;
 	vector<Water*> _waterList;
-	vector<NPC*> _npcList;
+	vector<NPC*> _npcList;	
 
 	Player* _player;
 	int currentNodeIndex = 0;
@@ -30,17 +31,30 @@ class HorizontalFieldScene : public Scene
 
 	GridTile begin, destination;
 	std::array<std::array<GridTile*, (HEIGHT / Y_STEP)>, (WIDTH / X_STEP)> gridMap;
-	std::vector<GridTile*> drawPath;
+	std::vector<GridTile*> drawingPath;
+	std::vector<GridTile*> drawingObstacles;
+	std::vector<GridTile*> drawingTankNodes;
+	std::set<int, std::greater <int>> npcsDestination;
 	GridTile* destinationNode;
 
 	bool _isDrawPath = true;
 	bool _isDrawMap = true;
+	bool _isDrawObstacles = true;
 
 	void ResetScene();
 	void RunAStar();
+	void RunAStar(NPC* npc, Node destination);
 	void DrawPath();
 	void GivePlayerOrder();
+	void GiveNPCOrder();
+	void GiveNPCPath(NPC* npc);
+	NPC* FindChangePathNPC(NPC* npc1, NPC* npc2);	
+	GridTile* GetNPCTempPoint(NPC* npc, Direction direction);
+	void UpdateTankNodes();
+	bool IsValidNPCDestination(int x, int y);
 public:
+	std::set<int, std::greater <int>> tankNodes;
+
 	HorizontalFieldScene();
 	~HorizontalFieldScene() {};
 

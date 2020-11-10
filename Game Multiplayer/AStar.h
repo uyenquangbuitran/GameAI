@@ -10,7 +10,7 @@
 #include "FibonacciHeap.h"
 #include "GameDefine.h"
 #include "GraphNode.h"
-
+#include "GameLog.h"
 
 /*
 Smooth path.
@@ -18,8 +18,7 @@ Apply to game.
 */
 
 
-static std::set<int, std::greater <int>> obstaclesNode;
-
+//
 class AStar
 {	
 public:
@@ -34,18 +33,18 @@ public:
 		obstaclesNode.insert(id);
 	}*/
 
-	void setObstaclesNode(std::set<int, std::greater <int>> value)
+	/*void setObstaclesNode(std::set<int, std::greater <int>> value)
 	{
 		obstaclesNode = value;
-	}
+	}*/
 
-	static bool IsValid(int x, int y)
-	{
-		if (x == 0 && y == 0)
-			std::cout << "ERROR!" << std::endl;
-		int id = x + y * (WIDTH / X_STEP);
+	static bool IsValid(int x, int y, std::set<int,
+		std::greater <int>> obstaclesNode,
+		std::set<int, std::greater <int>> tankNodes)
+	{	
+		int id = x + y * (WIDTH / X_STEP);		
 
-		if (!obstaclesNode.count(id))
+		if (!obstaclesNode.count(id) && !tankNodes.count(id))
 		{
 			if (x < 0 || y < 0 || x >= (WIDTH / X_STEP) || y >= (HEIGHT / Y_STEP))
 				return false;
@@ -103,10 +102,12 @@ public:
 	}
 
 	static std::vector<Node> aStar(Node begin, Node dest,
-		std::array<std::array<GridTile*, (HEIGHT / Y_STEP)>, (WIDTH / X_STEP)> map)
+		std::array<std::array<GridTile*, (HEIGHT / Y_STEP)>, (WIDTH / X_STEP)> map,
+		std::set<int, std::greater <int>> obstaclesNode,
+		std::set<int, std::greater <int>> tankNodes)
 	{
 		std::vector<Node> empty;
-		if (!IsValid(dest.x, dest.y))
+		if (!IsValid(dest.x, dest.y, obstaclesNode, tankNodes))
 		{
 			std::cout << "Invalid destination." << std::endl;
 			return empty;
@@ -164,7 +165,7 @@ public:
 			do
 			{
 				node = openList.removeMinimum();
-			} while (!IsValid(node.x, node.y));
+			} while (!IsValid(node.x, node.y, obstaclesNode, tankNodes));
 
 			x = node.x;
 			y = node.y;
@@ -176,7 +177,7 @@ public:
 				for (int newY = -1; newY <= 1; newY++)
 				{
 					double gNew, hNew, fNew;
-					if (IsValid(x + newX, y + newY))
+					if (IsValid(x + newX, y + newY, obstaclesNode, tankNodes))
 					{
 						if (IsDestination(x + newX, y + newY, dest) && (newX == 0 || newY == 0))
 						{

@@ -38,6 +38,16 @@ void Player::Update(float _dt)
 	if (IsDeleted)
 		return;
 
+	if (_isPausing)
+	{
+		onPauseTime += _dt;
+		if (onPauseTime >= pauseTime)
+		{
+			_isPausing = false;
+			onPauseTime = 0;
+		}
+	}
+
 	Position += Velocity * _dt;
 
 	if (_isShield)
@@ -134,6 +144,15 @@ void Player::Stop()
 	_direction = D_Stand;
 	_isMoving = false;
 	SetAnimation(_direction);
+	ApplyVelocity();
+}
+
+void Player::Pause(float delayAmount)
+{
+	pauseTime = delayAmount;
+	_direction = D_Stand;
+	_isMoving = false;
+	_isPausing = true;
 	ApplyVelocity();
 }
 

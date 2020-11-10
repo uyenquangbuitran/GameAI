@@ -2,6 +2,7 @@
 
 #include "SpriteList.h"
 #include "GameCollision.h"
+#include "GameLog.h"
 
 NPC::NPC()
 {
@@ -35,6 +36,16 @@ void NPC::Update(float _dt)
 	if (IsDeleted)
 		return;
 
+	if (_isPausing)
+	{
+		onPauseTime += _dt;
+		if (onPauseTime >= pauseTime)
+		{
+			_isPausing = false;
+			onPauseTime = 0;
+		}			
+	}		
+
 	Position += Velocity * _dt;
 }
 
@@ -44,6 +55,169 @@ void NPC::Draw()
 		return;
 
 	_currentAnimation->Draw(Position);
+}
+
+void NPC::Move(D3DXVECTOR2 destination)
+{
+	if (abs(destination.x - Position.x) < 2)
+	{
+		destination.x = round(destination.x);
+		Position.x = destination.x;
+	}
+
+	if (abs(destination.y - Position.y) < 2)
+	{
+		destination.y = round(destination.y);
+		Position.y = destination.y;
+	}
+
+	if (destination.x - Position.x < -0.5f)
+	{
+		_direction = D_Left;
+		_isMoving = true;
+	}
+	else if (destination.x - Position.x > 0.5f)
+	{
+		_direction = D_Right;
+		_isMoving = true;
+	}
+	else if (destination.y - Position.y < -0.5f)
+	{
+		_direction = D_Up;
+		_isMoving = true;
+	}
+	else if (destination.y - Position.y > 0.5f)
+	{
+		_direction = D_Down;
+		_isMoving = true;
+	}
+	else
+	{
+		_direction = D_Stand;
+		_isMoving = false;
+	}		
+	
+	ApplyVelocity();
+	ApplyAnimation();
+}
+
+Direction NPC::GetNewDirection()
+{	
+	if (_direction == D_Stand)
+		Move(path[currentNodeIndex]->GetPosition());
+
+	if (changePathTime == 0)
+	{
+		_oldDirection = _direction;
+		currentNodeIndex = 0;
+	}		
+
+	Direction d;
+	switch (changePathTime)
+	{
+
+		if (_direction == D_Stand)
+			GAMELOG("ERROR!");
+	case 0:
+		if (rand() % 2 == 0)
+		{
+			switch (_direction) // turn to the left of the current direction.
+			{
+			case D_Left:
+				d = D_Down;
+				break;
+			case D_Up:
+				d = D_Left;
+				break;
+			case D_Right:
+				d = D_Up;
+				break;
+			case D_Down:
+				d = D_Right;
+				break;
+			}
+		}
+		else
+		{
+			switch (_direction) // turn to the right of the current direction.
+			{
+			case D_Left:
+				d = D_Up;
+				break;
+			case D_Up:
+				d = D_Right;
+				break;
+			case D_Right:
+				d = D_Down;
+				break;
+			case D_Down:
+				d = D_Left;
+				break;
+			}
+		}		
+		break;
+	case 1:
+		switch (_direction) // turn to the opposite of the new direction.
+		{
+		case D_Left:
+			d = D_Right;
+			break;
+		case D_Up:
+			d = D_Down;
+			break;
+		case D_Right:
+			d = D_Left;
+			break;
+		case D_Down:
+			d = D_Up;
+			break;
+		}
+		break;
+	case 2:
+		switch (_oldDirection) // turn to the opposite of the old direction.
+		{
+		case D_Left:
+			d = D_Right;
+			break;
+		case D_Up:
+			d = D_Down;
+			break;
+		case D_Right:
+			d = D_Left;
+			break;
+		case D_Down:
+			d = D_Up;
+			break;
+		}
+		break;		
+	default:
+		d = D_Stand;
+		break;
+	}
+
+	return d;
+}
+
+void NPC::Stop()
+{
+	_direction = D_Stand;
+	_isMoving = false;
+	ApplyVelocity();
+}
+
+void NPC::Pause(float delayAmount)
+{
+	pauseTime = delayAmount;
+	_direction = D_Stand;
+	_isMoving = false;
+	_isPausing = true;
+	ApplyVelocity();
+}
+
+void NPC::ChangePath(GridTile* newPoint)
+{
+	if (newPoint)
+		tempPath.emplace_back(newPoint);
 }
 
 void NPC::CheckCollision(Entity * e)
@@ -71,6 +245,35 @@ void NPC::CheckCollision(Entity * e)
 			Position.y -= (float)(cR.Rect.bottom - cR.Rect.top) - 1;
 		}
 	}
+}
+
+bool NPC::GetCollisionResult(Entity* e)
+{
+	if (IsDeleted)
+		return false;
+
+	CollisionResult cR = GameCollision::getCollisionResult(this, e);
+	if (cR.IsCollided)
+	{
+		if (cR.Side == CS_Left)
+		{
+			Position.x += (float)(cR.Rect.right - cR.Rect.left) + 1;
+		}
+		else if (cR.Side == CS_Right)
+		{
+			Position.x -= (float)(cR.Rect.right - cR.Rect.left) - 1;
+		}
+		else if (cR.Side == CS_Top)
+		{
+			Position.y += (float)(cR.Rect.bottom - cR.Rect.top) + 1;
+		}
+		else if (cR.Side == CS_Bottom)
+		{
+			Position.y -= (float)(cR.Rect.bottom - cR.Rect.top) - 1;
+		}
+	}	
+
+	return cR.IsCollided;
 }
 
 void NPC::ApplyAnimation()
