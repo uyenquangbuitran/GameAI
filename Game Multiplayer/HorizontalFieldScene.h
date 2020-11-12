@@ -2,13 +2,16 @@
 
 #include <array>
 #include <vector>
+#include <unordered_map>
 #include "Scene.h"
 
 #include "GameDefine.h"
 #include "SpriteList.h"
 #include "GameGlobal.h"
 #include "GameLog.h"
+
 #include "GraphNode.h"
+#include "PairNodes.h"
 
 #include "Player.h"
 #include "NPC.h"
@@ -23,13 +26,12 @@ class HorizontalFieldScene : public Scene
 	vector<Water*> _waterList;
 	vector<NPC*> _npcList;	
 
-	Player* _player;
-	int currentNodeIndex = 0;
+	Player* _player;	
 	bool _isPlayerMoving = false;
-	bool _isMouseActive = true;
-	int mode = 1;
+	bool _isMouseActive = true;	
 
 	GridTile begin, destination;
+	std::unordered_map<PairNode, std::vector<GridTile*>> storedPath;
 	std::array<std::array<GridTile*, (HEIGHT / Y_STEP)>, (WIDTH / X_STEP)> gridMap;
 	std::vector<GridTile*> drawingPath;
 	std::vector<GridTile*> drawingObstacles;
@@ -39,11 +41,14 @@ class HorizontalFieldScene : public Scene
 
 	bool _isDrawPath = true;
 	bool _isDrawMap = true;
+	bool _isDrawDestinationOnly = false;
 	bool _isDrawObstacles = true;
 
 	void ResetScene();
+	void FindPath();
+	void FindPath(NPC* npc, Node destination);
 	void RunAStar();
-	void RunAStar(NPC* npc, Node destination);
+	void RunAStar(NPC* npc, Node begin, Node destination);
 	void DrawPath();
 	void GivePlayerOrder();
 	void GiveNPCOrder();

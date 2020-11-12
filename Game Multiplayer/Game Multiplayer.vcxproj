@@ -183,6 +183,7 @@
     <ClInclude Include="MapReader\zlib.h" />
     <ClInclude Include="MetalBrick.h" />
     <ClInclude Include="NPC.h" />
+    <ClInclude Include="PairNodes.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Pointed.h" />
     <ClInclude Include="ProtectItem.h" />

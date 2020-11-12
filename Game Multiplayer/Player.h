@@ -63,6 +63,7 @@ public:
 	
 	int getScore() { return _score; }	
 	std::vector<GridTile*> path;
+	int currentNodeIndex = 0;
 
 	bool IsMoving() { return _isMoving; }
 	bool IsPause() { return _isPausing; }

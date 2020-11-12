@@ -1,6 +1,7 @@
 #include <algorithm>
 
 #include "HorizontalFieldScene.h"
+#include "PairNodes.h"
 #include "AStar.h"
 
 HorizontalFieldScene::HorizontalFieldScene()
@@ -65,7 +66,8 @@ void HorizontalFieldScene::Update(float dt)
 {
 	if (keyboard[0x31]) // 1 -> normal mode, right click to set destination.
 	{
-		
+		_isDrawDestinationOnly = !_isDrawDestinationOnly;
+		if (_isDrawMap) GAMELOG("Drawing destination only."); else GAMELOG("Drawing all node.");
 		keyboard[0x31] = false;
 	}
 	else if (keyboard[0x32]) // 2 -> auto mode, right click will auto find path and move tank to destination.
@@ -94,7 +96,7 @@ void HorizontalFieldScene::Update(float dt)
 	else if (keyboard[0x45]) // E
 	{
 		_isDrawObstacles = !_isDrawObstacles;
-		if (_isDrawPath) GAMELOG("Drawing obstacles on."); else GAMELOG("Drawing obstacles off.");
+		if (_isDrawObstacles) GAMELOG("Drawing obstacles on."); else GAMELOG("Drawing obstacles off.");
 		keyboard[0x45] = false;
 	}
 	else if (keyboard[0x52]) // R
@@ -172,17 +174,20 @@ void HorizontalFieldScene::Update(float dt)
 				else
 					npc->Pause();
 			}				
-		}
+		}		
 
 		if (npc->GetCollisionResult(_player))
 		{
-			if (npc->IsPause())
-				continue;
-
 			npc->isChangedPath = true;
 			GridTile* tile = nullptr;
 			do
 			{
+				if (npc->IsPause())
+				{
+					_player->Pause(0.5f);
+					continue;
+				}
+					
 				Direction d = npc->GetNewDirection();
 				tile = GetNPCTempPoint(npc, d);
 				if (tile == nullptr)
@@ -197,7 +202,7 @@ void HorizontalFieldScene::Update(float dt)
 				npc->ChangePath(tile);
 			}
 
-			_player->Pause(0.5f);
+			_player->Pause(0.65f);
 		}
 
 		npc->Update(dt);
@@ -212,19 +217,7 @@ void HorizontalFieldScene::OnLeftMouseDown(float x, float y)
 {
 	if (!_isMouseActive) return;
 
-	if (mode != 3)
-	{
-		GAMELOG("(%d, %d)", int(x / float(X_STEP)), int(y / float(Y_STEP)));
-	}
-	else
-	{
-		int _x = int(x / float(X_STEP)), _y = int(y / float(Y_STEP));
-		int id = _x + _y * (WIDTH / X_STEP);
-		_map->obstaclesNode.insert(id);
-		gridMap[_x][_y]->SetType(Obstacle);
-		GAMELOG("%f, %f", x, y);
-		GAMELOG("(%d, %d)", _x, _y);
-	}
+	GAMELOG("(%d, %d)", int(x / float(X_STEP)), int(y / float(Y_STEP)));
 }
 
 void HorizontalFieldScene::OnRightMouseDown(float x, float y)
@@ -232,7 +225,7 @@ void HorizontalFieldScene::OnRightMouseDown(float x, float y)
 	if (!_isMouseActive) return;
 
 	bool isInvalidDestination = false;
-
+	
 	if (!_isPlayerMoving)
 	{
 		ResetScene();
@@ -254,7 +247,8 @@ void HorizontalFieldScene::OnRightMouseDown(float x, float y)
 		*destinationNode = destination;
 		gridMap[destination.x][destination.y]->SetType(Destination);
 
-		RunAStar();
+		UpdateTankNodes();
+		FindPath();
 		DrawPath();
 		if (isInvalidDestination) gridMap[destination.x][destination.y]->SetType(Obstacle);
 		_isPlayerMoving = true;
@@ -263,7 +257,7 @@ void HorizontalFieldScene::OnRightMouseDown(float x, float y)
 	{
 		_player->Stop();
 		_isPlayerMoving = false;
-		currentNodeIndex = 0;
+		_player->currentNodeIndex = 0;
 
 		ResetScene();
 
@@ -286,7 +280,8 @@ void HorizontalFieldScene::OnRightMouseDown(float x, float y)
 		*destinationNode = destination;
 		gridMap[destination.x][destination.y]->SetType(Destination);
 
-		RunAStar();
+		UpdateTankNodes();
+		FindPath();
 		DrawPath();
 		if (isInvalidDestination) gridMap[destination.x][destination.y]->SetType(Obstacle);
 		_isPlayerMoving = true;
@@ -307,6 +302,60 @@ void HorizontalFieldScene::ResetScene()
 	}
 	_player->path.clear();
 	drawingPath.clear();
+}
+
+void HorizontalFieldScene::FindPath()
+{
+	CoorNode cbegin = CoorNode(begin.GetX(), begin.GetY());
+	CoorNode cdes = CoorNode(destination.GetX(), destination.GetY());
+	PairNode pair(cbegin, cdes);
+
+	std::unordered_map<PairNode, std::vector<GridTile*>>::iterator foundPath = storedPath.find(pair);
+	
+	if (foundPath != storedPath.end())
+	{
+		_player->path.clear();
+		_player->path = foundPath->second;
+		
+		if (foundPath->first.IsReversed(pair))			
+		{
+			//Reverse path.
+			std::reverse(_player->path.begin(), _player->path.end());
+		}
+	}
+	else
+	{
+		RunAStar();
+	}
+}
+
+void HorizontalFieldScene::FindPath(NPC* npc, Node destination)
+{
+	Node beginNode;
+	//Setting position for begin node.	
+	beginNode.SetX(int(npc->Position.x / float(X_STEP)));
+	beginNode.SetY(int(npc->Position.y / float(Y_STEP)));
+
+	CoorNode cbegin = CoorNode(beginNode.GetX(), beginNode.GetY());
+	CoorNode cdes = CoorNode(destination.GetX(), destination.GetY());
+	PairNode pair = PairNode(cbegin, cdes);
+
+	std::unordered_map<PairNode, std::vector<GridTile*>>::iterator foundPath = storedPath.find(pair);
+	if (foundPath != storedPath.end())
+	{
+		npc->path.clear();
+		npc->path = foundPath->second;
+
+		if (foundPath->first.IsReversed(pair))
+		{
+			//Reverse path.
+			std::reverse(npc->path.begin(), npc->path.end());
+		}
+	}
+	else
+	{
+		RunAStar(npc, beginNode, destination);
+	}
 }
 
 void HorizontalFieldScene::RunAStar()
@@ -330,22 +379,26 @@ void HorizontalFieldScene::RunAStar()
 	{
 		_player->path.emplace_back(gridMap[it->GetX()][it->GetY()]);
 	}
+
+	PairNode pair = PairNode(CoorNode(begin.GetX(), begin.GetY()),
+		CoorNode(destination.GetX(), destination.GetY()));
+	storedPath.emplace(pair, _player->path);
 }
 
-void HorizontalFieldScene::RunAStar(NPC* npc, Node destination)
+void HorizontalFieldScene::RunAStar(NPC* npc, Node beginNode, Node destination)
 {
-	npc->path.clear();
-	Node beginNode;
-	//Setting position for begin node.	
-	beginNode.SetX(int(npc->Position.x / float(X_STEP)));
-	beginNode.SetY(int(npc->Position.y / float(Y_STEP)));
+	npc->path.clear();	
 
 	std::vector<Node> result = AStar::aStar(beginNode, destination, gridMap, _map->obstaclesNode, tankNodes);
 
 	for (std::vector<Node>::iterator it = result.begin(); it != result.end(); it = std::next(it))
 	{
 		npc->path.emplace_back(gridMap[it->GetX()][it->GetY()]);
-	}	
+	}
+
+	PairNode pair = PairNode(CoorNode(beginNode.GetX(), beginNode.GetY()),
+		CoorNode(destination.GetX(), destination.GetY()));
+	storedPath.emplace(pair, npc->path);
 }
 
 void HorizontalFieldScene::DrawPath()
@@ -369,14 +422,14 @@ void HorizontalFieldScene::GivePlayerOrder()
 
 	if (_isPlayerMoving)
 	{
-		if (currentNodeIndex < _player->path.size())
+		if (_player->currentNodeIndex < _player->path.size())
 		{
-			_player->Move(_player->path[currentNodeIndex]->position);
-			if (!_player->IsMoving()) currentNodeIndex++;
+			_player->Move(_player->path[_player->currentNodeIndex]->position);
+			if (!_player->IsMoving()) _player->currentNodeIndex++;
 		}
 		else
 		{
-			currentNodeIndex = 0;
+			_player->currentNodeIndex = 0;
 			_isPlayerMoving = false;
 		}
 	}
@@ -432,7 +485,7 @@ void HorizontalFieldScene::GiveNPCPath(NPC* npc)
 	{
 		x = npc->path[npc->path.size() - 1]->GetX();
 		y = npc->path[npc->path.size() - 1]->GetY();
-		if (npc->Position == npc->path[currentNodeIndex]->position)
+		if (npc->Position == npc->path[npc->currentNodeIndex]->position)
 			npc->currentNodeIndex = 1;
 		npc->isRepath = false;
 	}
@@ -449,7 +502,7 @@ void HorizontalFieldScene::GiveNPCPath(NPC* npc)
 	Node npcDes;
 	npcDes.SetX(x); npcDes.SetY(y);
 	UpdateTankNodes();
-	RunAStar(npc, npcDes);
+	FindPath(npc, npcDes);
 }
 
 NPC* HorizontalFieldScene::FindChangePathNPC(NPC* npc1, NPC* npc2)
@@ -481,6 +534,7 @@ NPC* HorizontalFieldScene::FindChangePathNPC(NPC* npc1, NPC* npc2)
 
 GridTile* HorizontalFieldScene::GetNPCTempPoint(NPC* npc, Direction direction)
 {
+	UpdateTankNodes();
 	int _x = int(npc->Position.x / float(X_STEP));
 	int _y = int(npc->Position.y / float(Y_STEP));
 
@@ -558,7 +612,13 @@ void HorizontalFieldScene::Draw()
 	{
 		for (int y = 0; y < (HEIGHT / Y_STEP); y++)
 		{
-			gridMap[x][y]->Draw();
+			if (_isDrawDestinationOnly)
+			{
+				if (gridMap[x][y]->type == Destination)
+					gridMap[x][y]->Draw();
+			}
+			else
+				gridMap[x][y]->Draw();
 		}
 	}
 

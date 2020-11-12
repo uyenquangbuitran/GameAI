@@ -202,6 +202,9 @@
     <ClInclude Include="HorizontalFieldScene.h">
       <Filter>Scenes</Filter>
     </ClInclude>
+    <ClInclude Include="PairNodes.h">
+      <Filter>Astar</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="MapReader\Tmx.h.in">

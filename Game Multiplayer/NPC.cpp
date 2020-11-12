@@ -257,19 +257,19 @@ bool NPC::GetCollisionResult(Entity* e)
 	{
 		if (cR.Side == CS_Left)
 		{
-			Position.x += (float)(cR.Rect.right - cR.Rect.left) + 1;
+			Position.x += (float)(cR.Rect.right - cR.Rect.left) + 2;
 		}
 		else if (cR.Side == CS_Right)
 		{
-			Position.x -= (float)(cR.Rect.right - cR.Rect.left) - 1;
+			Position.x -= (float)(cR.Rect.right - cR.Rect.left) - 2;
 		}
 		else if (cR.Side == CS_Top)
 		{
-			Position.y += (float)(cR.Rect.bottom - cR.Rect.top) + 1;
+			Position.y += (float)(cR.Rect.bottom - cR.Rect.top) + 2;
 		}
 		else if (cR.Side == CS_Bottom)
 		{
-			Position.y -= (float)(cR.Rect.bottom - cR.Rect.top) - 1;
+			Position.y -= (float)(cR.Rect.bottom - cR.Rect.top) - 2;
 		}
 	}	
 
