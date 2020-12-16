@@ -23,8 +23,8 @@ protected:
 	void BaseInit(D3DXVECTOR2 position)
 	{
 		Position = position;
-		_width = 16;
-		_height = 16;
+		_width = 32;
+		_height = 32;
 		_animation = new Animation();
 	}
 };

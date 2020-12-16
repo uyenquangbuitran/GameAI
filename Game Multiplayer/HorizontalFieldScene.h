@@ -15,6 +15,7 @@
 
 #include "Player.h"
 #include "NPC.h"
+#include "Bullet.h"
 
 #include "GameMap.h"
 #include "Water.h"
@@ -25,6 +26,7 @@ class HorizontalFieldScene : public Scene
 	GameMap* _map;
 	vector<Water*> _waterList;
 	vector<NPC*> _npcList;	
+	vector<Bullet*> _bulletList;
 
 	Player* _player;	
 	bool _isPlayerMoving = false;
@@ -51,12 +53,10 @@ class HorizontalFieldScene : public Scene
 	void RunAStar(NPC* npc, Node begin, Node destination);
 	void DrawPath();
 	void GivePlayerOrder();
-	void GiveNPCOrder();
 	void GiveNPCPath(NPC* npc);
 	NPC* FindChangePathNPC(NPC* npc1, NPC* npc2);	
-	GridTile* GetNPCTempPoint(NPC* npc, Direction direction);
-	void UpdateTankNodes();
-	bool IsValidNPCDestination(int x, int y);
+	GridTile* GetNPCTempPoint(NPC* npc, Direction direction);		
+	
 public:
 	std::set<int, std::greater <int>> tankNodes;
 
@@ -68,4 +68,9 @@ public:
 
 	void OnLeftMouseDown(float x, float y) override;
 	void OnRightMouseDown(float x, float  y) override;
+
+	void UpdateTankNodes();
+	bool IsValidNPCDestination(int x, int y);
+
+	Bullet* GetBullet();
 };

@@ -19,7 +19,7 @@
     <Filter Include="Scenes">
       <UniqueIdentifier>{75de916b-b23b-4698-a33e-04d9b50211af}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Astar">
+    <Filter Include="AI">
       <UniqueIdentifier>{1cf9c8ce-cf70-4471-b829-4690001d636a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -188,22 +188,25 @@
       <Filter>Scenes</Filter>
     </ClInclude>
     <ClInclude Include="FibonacciHeap.h">
-      <Filter>Astar</Filter>
+      <Filter>AI</Filter>
     </ClInclude>
     <ClInclude Include="AStar.h">
-      <Filter>Astar</Filter>
+      <Filter>AI</Filter>
     </ClInclude>
     <ClInclude Include="GraphNode.h">
-      <Filter>Astar</Filter>
+      <Filter>AI</Filter>
     </ClInclude>
     <ClInclude Include="GridTile.h">
-      <Filter>Astar</Filter>
+      <Filter>AI</Filter>
     </ClInclude>
     <ClInclude Include="HorizontalFieldScene.h">
       <Filter>Scenes</Filter>
     </ClInclude>
     <ClInclude Include="PairNodes.h">
-      <Filter>Astar</Filter>
+      <Filter>AI</Filter>
+    </ClInclude>
+    <ClInclude Include="NPCDecisionMaker.h">
+      <Filter>AI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -328,13 +331,19 @@
       <Filter>Scenes</Filter>
     </ClCompile>
     <ClCompile Include="GridTile.cpp">
-      <Filter>Astar</Filter>
+      <Filter>AI</Filter>
     </ClCompile>
     <ClCompile Include="GraphNode.cpp">
-      <Filter>Astar</Filter>
+      <Filter>AI</Filter>
     </ClCompile>
     <ClCompile Include="HorizontalFieldScene.cpp">
       <Filter>Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="Bullet.cpp">
+      <Filter>Game Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="NPCDecisionMaker.cpp">
+      <Filter>AI</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

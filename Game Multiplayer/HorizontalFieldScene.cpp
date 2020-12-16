@@ -6,7 +6,7 @@
 
 HorizontalFieldScene::HorizontalFieldScene()
 {
-	_map = new GameMap("Resource files/ai_map1.tmx");
+	_map = new GameMap("Resource files/ai_map2.tmx");
 
 	_player = new Player();
 	_player->Position = D3DXVECTOR2(48.f, 48.f);
@@ -53,6 +53,12 @@ HorizontalFieldScene::HorizontalFieldScene()
 	npc2->Position = D3DXVECTOR2(912.f, 432.f);
 	_npcList.emplace_back(npc2);
 
+	for (int counter = 0; counter < _npcList.size(); counter++)
+	{
+		Bullet* bullet = new Bullet();
+		_bulletList.emplace_back(bullet);
+	}
+
 	/*for (int index = 0; index < 2; index++)
 	{
 		NPC* npc = new NPC();
@@ -72,12 +78,12 @@ void HorizontalFieldScene::Update(float dt)
 	}
 	else if (keyboard[0x32]) // 2 -> auto mode, right click will auto find path and move tank to destination.
 	{
-		
+		_npcList[0]->Fire();
 		keyboard[0x32] = false;
 	}
 	else if (keyboard[0x33]) // 3 -> editor mode, left click will set obstacle, right click will remove obstacle.
 	{
-		
+		GAMELOG("Bullet pos: %f, %f", _bulletList[0]->Position.x, _bulletList[0]->Position.y);
 		keyboard[0x33] = false;
 	}
 
@@ -117,6 +123,9 @@ void HorizontalFieldScene::Update(float dt)
 			GAMELOG("Mouse is deactived!");
 		keyboard[0x46] = false;
 	}
+
+	for (auto bullet : _bulletList)
+		bullet->Update(dt);
 	
 	//Check collision with bricks.
 	for (auto brick : _map->getBrickList())
@@ -129,6 +138,9 @@ void HorizontalFieldScene::Update(float dt)
 			{
 				npc->CheckCollision(brick);
 			}
+
+			for (auto bullet : _bulletList)
+				bullet->CheckCollision(brick);
 		}
 	}
 
@@ -140,6 +152,9 @@ void HorizontalFieldScene::Update(float dt)
 			npc->hasPath = true;
 		}
 
+		for (auto bullet : _bulletList)
+			bullet->CheckCollision(npc);
+
 		for (auto cNpc : _npcList)
 		{
 			if (cNpc == npc)
@@ -149,9 +164,13 @@ void HorizontalFieldScene::Update(float dt)
 				NPC* changePathNPC = FindChangePathNPC(npc, cNpc);
 
 				if (changePathNPC->IsPause())
-					continue;				
+					continue;
 
-				changePathNPC->isChangedPath = true;
+				if ((cNpc->IsStand() && npc->isChangedPath) || (npc->IsStand() && cNpc->isChangedPath))
+				{
+					UpdateTankNodes();					
+				}
+				
 				GridTile* tile = nullptr;
 				do
 				{
@@ -159,7 +178,7 @@ void HorizontalFieldScene::Update(float dt)
 					tile = GetNPCTempPoint(changePathNPC, d);
 					if (tile == nullptr)
 						changePathNPC->changePathTime++;
-				} while (tile == nullptr && changePathNPC->changePathTime < 3);
+				} while (tile == nullptr && changePathNPC->changePathTime < 3);				
 
 				if (std::find(changePathNPC->tempPath.begin(),
 					changePathNPC->tempPath.end(),
@@ -167,6 +186,7 @@ void HorizontalFieldScene::Update(float dt)
 					|| changePathNPC->tempPath.empty())
 				{
 					changePathNPC->ChangePath(tile);
+					changePathNPC->isChangedPath = true;
 				}
 
 				if (changePathNPC == npc)
@@ -209,7 +229,8 @@ void HorizontalFieldScene::Update(float dt)
 	}
 
 	GivePlayerOrder();
-	GiveNPCOrder();
+	for (auto bullet : _bulletList)
+		bullet->CheckCollision(_player);
 	_player->Update(dt);
 }
 
@@ -354,7 +375,8 @@ void HorizontalFieldScene::FindPath(NPC* npc, Node destination)
 	}
 	else
 	{
-		RunAStar(npc, beginNode, destination);
+		tankNodes.erase(cbegin.GetX() + cbegin.GetY() * (WIDTH / X_STEP));
+		RunAStar(npc, beginNode, destination);		
 	}
 }
 
@@ -431,49 +453,6 @@ void HorizontalFieldScene::GivePlayerOrder()
 		{
 			_player->currentNodeIndex = 0;
 			_isPlayerMoving = false;
-		}
-	}
-}
-
-void HorizontalFieldScene::GiveNPCOrder()
-{
-	
-	for (auto npc : _npcList)
-	{
-		if (npc->IsPause())
-			continue;
-
-		if (!npc->isChangedPath)
-		{
-			if (npc->currentNodeIndex < npc->path.size())
-			{
-				npc->Move(npc->path[npc->currentNodeIndex]->position);
-				if (!npc->IsMoving()) npc->currentNodeIndex++;
-			}
-			else
-			{
-				npc->currentNodeIndex = 0;
-				npc->hasPath = false;
-			}
-		}
-		else
-		{
-			if (npc->currentNodeIndex < npc->tempPath.size())
-			{
-				npc->Move(npc->tempPath[npc->currentNodeIndex]->position);
-				if (!npc->IsMoving())
-					npc->currentNodeIndex++;
-			}
-			else
-			{
-				npc->currentNodeIndex = 0;
-				npc->hasPath = false;
-				npc->isChangedPath = false;
-				npc->tempPath.clear();
-				npc->changePathTime = 0;
-				npc->Pause(0.45f);
-				npc->isRepath = true;
-			}
 		}
 	}
 }
@@ -598,12 +577,22 @@ void HorizontalFieldScene::UpdateTankNodes()
 	{
 		_x = int(npc->Position.x / float(X_STEP));
 		_y = int(npc->Position.y / float(Y_STEP));
+		id = _x + _y * (WIDTH / X_STEP);
 		tankNodes.insert(id);
 
 		GridTile* tile1 = gridMap[_x][_y];
 		tile->SetType(Obstacle);
 		drawingTankNodes.emplace_back(tile1);
 	}	
+}
+
+Bullet* HorizontalFieldScene::GetBullet()
+{
+	for (int index = 0; index < _bulletList.size(); index++)
+		if (_bulletList[index]->IsDeleted)
+			return _bulletList[index];
+	
+	return nullptr;
 }
 
 void HorizontalFieldScene::Draw()
@@ -646,4 +635,7 @@ void HorizontalFieldScene::Draw()
 	}
 
 	_player->Draw();
+
+	for (auto bullet : _bulletList)
+		bullet->Draw();
 }

@@ -2,6 +2,8 @@
 
 #include "SpriteList.h"
 #include "GameCollision.h"
+#include "SceneManager.h"
+#include "HorizontalFieldScene.h"
 #include "GameLog.h"
 
 NPC::NPC()
@@ -27,6 +29,7 @@ NPC::NPC()
 
 	// mặc định animation ban đầu
 	_currentAnimation = _leftAnimation;
+	_faceDirection = D_Left;
 
 	Position = D3DXVECTOR2(15.f, 15.f);
 }
@@ -36,6 +39,77 @@ void NPC::Update(float _dt)
 	if (IsDeleted)
 		return;
 
+	//Give NPC an order about where to go next.
+	if (!_isPausing)
+	{
+		if (!isChangedPath)
+		{
+			if (currentNodeIndex < path.size())
+			{
+				/*int x = path[currentNodeIndex]->GetX();
+				int y = path[currentNodeIndex]->GetY();
+				if (dynamic_cast<HorizontalFieldScene*>
+					(SceneManager::Instance()->GetCurrentScene())->IsValidNPCDestination(x, y))
+				{
+					Move(path[currentNodeIndex]->GetPosition());
+				}
+				else
+				{
+					GAMELOG("Skip main path at: %d", GetTickCount());
+					currentNodeIndex = 0;
+					hasPath = false;
+				}*/
+				Move(path[currentNodeIndex]->GetPosition());
+				if (!_isMoving) currentNodeIndex++;
+			}
+			else
+			{
+				currentNodeIndex = 0;
+				hasPath = false;
+			}
+		}
+		else
+		{
+			if (currentNodeIndex < tempPath.size())
+			{
+				int x = tempPath[currentNodeIndex]->GetX();
+				int y = tempPath[currentNodeIndex]->GetY();
+				if (dynamic_cast<HorizontalFieldScene*>
+					(SceneManager::Instance()->GetCurrentScene())->IsValidNPCDestination(x, y))
+				{
+					Move(tempPath[currentNodeIndex]->GetPosition());
+				}
+				else
+				{
+					//GAMELOG("Skip temp path at: %d", GetTickCount());
+					currentNodeIndex = 0;
+					hasPath = false;
+					isChangedPath = false;
+					tempPath.clear();
+					changePathTime = 0;
+					Pause(0.45f);
+					isRepath = true;
+				}				
+				if (!_isMoving) currentNodeIndex++;
+			}
+			else
+			{
+				currentNodeIndex = 0;
+				hasPath = false;
+				isChangedPath = false;
+				tempPath.clear();
+				changePathTime = 0;
+				Pause(0.45f);
+				isRepath = true;
+			}
+		}
+	}	
+
+	// Set NPC face direction for shooting.
+	if (_direction != D_Stand)
+		_faceDirection = _direction;
+
+	// Update NPC timer if NPC is pausing.
 	if (_isPausing)
 	{
 		onPauseTime += _dt;
@@ -110,7 +184,12 @@ Direction NPC::GetNewDirection()
 	{
 		_oldDirection = _direction;
 		currentNodeIndex = 0;
-	}		
+	}
+
+	if (isChangedPath && _direction == D_Stand)
+	{
+		changePathTime = 0;
+	}
 
 	Direction d;
 	switch (changePathTime)
@@ -212,6 +291,33 @@ void NPC::Pause(float delayAmount)
 	_isMoving = false;
 	_isPausing = true;
 	ApplyVelocity();
+}
+
+void NPC::Fire()
+{
+	Bullet* bullet = dynamic_cast<HorizontalFieldScene*>(SceneManager::Instance()->GetCurrentScene())->GetBullet();
+	if (bullet == nullptr) return;
+
+	bullet->Position = this->Position;
+	switch (_faceDirection)
+	{
+	case D_Left:
+		bullet->Position.x -= this->getWidth() / 2 - 2;
+		break;
+	case D_Right:
+		bullet->Position.x += this->getWidth() / 2 + 2;
+		break;		 
+	case D_Up:
+		bullet->Position.y -= this->getWidth() / 2 - 2;
+		break;
+	case D_Down:
+		bullet->Position.y += this->getWidth() / 2 + 2;
+		break;
+	}
+	
+	bullet->SetShotTank(this);
+	bullet->IsDeleted = false;	
+	bullet->setDirection(this->_direction);	
 }
 
 void NPC::ChangePath(GridTile* newPoint)

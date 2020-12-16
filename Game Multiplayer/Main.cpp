@@ -54,14 +54,17 @@ int InitWindow(int cmdShow)
 	wc.hIconSm = NULL;
 	RegisterClassEx(&wc);
 
+	RECT wr = { 0, 0, GameGlobal::Width, GameGlobal::Height };
+	AdjustWindowRect(&wr, WS_OVERLAPPEDWINDOW, FALSE);
+
 	HWND hWnd = CreateWindow(
 		WIN_NAME,
 		WIN_NAME,
 		WS_OVERLAPPEDWINDOW,
 		116,
 		40,
-		GameGlobal::Width,
-		GameGlobal::Height,
+		wr.right - wr.left,
+		wr.bottom - wr.top,
 		NULL,
 		NULL,
 		_hInstance,

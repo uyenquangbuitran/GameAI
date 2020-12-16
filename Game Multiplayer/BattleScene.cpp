@@ -76,11 +76,6 @@ BattleScene::BattleScene()
 	_waterBrick = new Water(D3DXVECTOR2(10.0f, 10.0f));
 }
 
-void BattleScene::MovePlayer()
-{
-
-}
-
 void BattleScene::Update(float dt)
 {
 	_player->HandleKeyboard(keyboard, dt);

@@ -3,11 +3,13 @@
 #include "Entity.h"
 #include "Explosion.h"
 #include "GridTile.h"
+#include "Bullet.h"
 
 class NPC :public Entity
 {
 	float _speed = 130.f;
 	Direction _direction; // hướng di chuyển
+	Direction _faceDirection;
 	Direction _oldDirection;
 
 	float onPauseTime = 0.f;
@@ -50,9 +52,11 @@ public:
 
 	bool IsMoving() { return _isMoving; }
 	bool IsPause() { return _isPausing; }
+	bool IsStand() { return (_direction == D_Stand); }
 	void Move(D3DXVECTOR2 destination);
 	void Stop();
 	void Pause(float delayAmount = 0.15f);
+	void Fire();
 
 	void ChangePath(GridTile* newPoint);
 	Direction GetNewDirection();
