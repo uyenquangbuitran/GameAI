@@ -8,6 +8,9 @@ GridScene::GridScene()
 	player = new Player();
 	player->Position = D3DXVECTOR2(16.f, 16.f);
 
+	camera.Init(GameGlobal::Height, GameGlobal::Width, 0, 1000, 0, 1000);
+	camera.setPosition(D3DXVECTOR2(0.f, 0.f));
+
 	begin = GridTile();
 	begin.SetPosition(D3DXVECTOR2(0.f, 0.f));	
 	begin.SetX(0);
@@ -321,6 +324,9 @@ void GridScene::GivePlayerOrder()
 
 void GridScene::Draw()
 {
+	// camera offset
+	D3DXVECTOR2 offset(GameGlobal::Width / 2.f - camera.Position.x, GameGlobal::Height / 2.f - camera.Position.y);
+
 	for (int x = 0; x < (WIDTH / X_STEP); x++)
 	{
 		for (int y = 0; y < (HEIGHT / Y_STEP); y++)

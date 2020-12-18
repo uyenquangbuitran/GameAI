@@ -1,18 +1,19 @@
-﻿#pragma once
-#include <d3dx9.h>
-#include <d3d9.h>
+#pragma once
+
+#include "GameGlobal.h"
 
 class Camera
 {
-	static D3DXVECTOR2 Position;
-	static int ScreenHeight;
-	static int ScreenWidth;
-	static int LeftLimit;
-	static int RightLimit;
-	static int TopLimit;
-	static int BottomLimit;
+public:
+	D3DXVECTOR2 Position;
+	int ScreenHeight;
+	int ScreenWidth;
+	int LeftLimit;
+	int RightLimit;
+	int TopLimit;
+	int BottomLimit;
 
-	static void Init(int _height, int _width, int _left, int _right, int _top, int _bottom)
+	void Init(int _height, int _width, int _left, int _right, int _top, int _bottom)
 	{
 		ScreenHeight = _height;
 		ScreenWidth = _width;
@@ -22,7 +23,7 @@ class Camera
 		BottomLimit = _bottom;
 	}
 
-	static void setPosition(const D3DXVECTOR2& _position)
+	void setPosition(const D3DXVECTOR2& _position)
 	{
 		Position = _position;
 
@@ -45,7 +46,7 @@ class Camera
 		}
 	}
 
-	static RECT getBound()
+	RECT getBound()
 	{
 		RECT _rect;
 		_rect.left = Position.x - ScreenWidth / 2.f;

@@ -9,11 +9,13 @@
 #include "GameGlobal.h"
 #include "GameLog.h"
 #include "Player.h"
+#include "Camera.h"
 
 class GridScene : public Scene
 {	
 	//MovingTile* movingTile;
 	Player* player;
+	Camera camera;
 	int currentNodeIndex = 0;
 	bool _isPlayerMoving = false;
 	bool _isMouseActive = true;
