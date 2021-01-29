@@ -38,15 +38,8 @@ void Player::Update(float _dt)
 	if (IsDeleted)
 		return;
 
-	if (_isPausing)
-	{
-		onPauseTime += _dt;
-		if (onPauseTime >= pauseTime)
-		{
-			_isPausing = false;
-			onPauseTime = 0;
-		}
-	}
+	//Give player an order about where to go next.
+	MovePath(_dt);
 
 	Position += Velocity * _dt;
 
@@ -93,6 +86,43 @@ void Player::HandleKeyboard(std::map<int, bool> keys, float _dt)
 
 	SetAnimation(_direction);
 	ApplyVelocity();
+}
+
+void Player::MovePath(float dt)
+{
+	if (_isCollision)
+	{
+		Stop();
+		_waittingTime += dt;
+		if (_waittingTime > 2.f)
+		{
+			_waittingTime = 0;
+			//RunDodging();
+			return;
+		}
+		return;
+	}
+
+	if (!path.empty())
+	{
+		if (currentNodeIndex >= path.size())
+		{
+			//RunAStar();
+		}
+		else
+		{
+			Move(path[currentNodeIndex]->GetPosition());
+			if (!_isMoving)
+			{
+				AStar::GetInstance()->SetTileValue(path[currentNodeIndex]->GetVec().x,
+					path[currentNodeIndex]->GetVec().y, 0);
+				currentNodeIndex++;
+				if (currentNodeIndex < path.size())
+					AStar::GetInstance()->SetTileValue(path[currentNodeIndex]->GetVec().x,
+						path[currentNodeIndex]->GetVec().y, ASTAR_VALUE_PLAYER);
+			}
+		}
+	}
 }
 
 void Player::Move(D3DXVECTOR2 destination)
@@ -346,6 +376,16 @@ void Player::Draw()
 	if (!IsDeleted)
 	{
 		_currentAnimation->Draw(Position);
+		if (_isShield)
+			_shieldAnimation->Draw(Position);
+	}
+}
+
+void Player::Draw(D3DXVECTOR2 offset)
+{
+	if (!IsDeleted)
+	{
+		_currentAnimation->Draw(Position, offset);
 		if (_isShield)
 			_shieldAnimation->Draw(Position);
 	}

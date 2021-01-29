@@ -10,6 +10,7 @@ class Node
 	float gCost;
 	float hCost;
 	float fCost;
+	int status = 0;
 	//GridTile value;
 	friend class AStar;
 public:
@@ -17,6 +18,8 @@ public:
 	int GetY() { return y; }
 	void SetX(int value) { x = value; }
 	void SetY(int value) { y = value; }
+	void SetXY(int _x, int _y) { x = _x; y = _y; }
+	float GetCost() { return fCost; }
 	bool operator < (const Node& n) const;
 	bool operator > (const Node& n) const;
 	friend std::ostream& operator << (std::ostream& os, const Node& n);

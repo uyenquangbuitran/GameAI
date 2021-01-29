@@ -39,8 +39,8 @@ void NPC::Update(float _dt)
 	if (IsDeleted)
 		return;
 
-	//Give NPC an order about where to go next.
-	if (!_isPausing)
+	//Give NPC an order about where to go next.	
+	if (!_isPausing && hasOrder)
 	{
 		if (!isChangedPath)
 		{
@@ -72,24 +72,24 @@ void NPC::Update(float _dt)
 		{
 			if (currentNodeIndex < tempPath.size())
 			{
-				int x = tempPath[currentNodeIndex]->GetX();
-				int y = tempPath[currentNodeIndex]->GetY();
-				if (dynamic_cast<HorizontalFieldScene*>
-					(SceneManager::Instance()->GetCurrentScene())->IsValidNPCDestination(x, y))
-				{
-					Move(tempPath[currentNodeIndex]->GetPosition());
-				}
-				else
-				{
-					//GAMELOG("Skip temp path at: %d", GetTickCount());
-					currentNodeIndex = 0;
-					hasPath = false;
-					isChangedPath = false;
-					tempPath.clear();
-					changePathTime = 0;
-					Pause(0.45f);
-					isRepath = true;
-				}				
+				//int x = tempPath[currentNodeIndex]->GetX();
+				//int y = tempPath[currentNodeIndex]->GetY();
+				//if (dynamic_cast<HorizontalFieldScene*>
+				//	(SceneManager::Instance()->GetCurrentScene())->IsValidNPCDestination(x, y))
+				//{
+				//	Move(tempPath[currentNodeIndex]->GetPosition());
+				//}
+				//else
+				//{
+				//	//GAMELOG("Skip temp path at: %d", GetTickCount());
+				//	currentNodeIndex = 0;
+				//	hasPath = false;
+				//	isChangedPath = false;
+				//	tempPath.clear();
+				//	changePathTime = 0;
+				//	Pause(0.45f);
+				//	isRepath = true;
+				//}				
 				if (!_isMoving) currentNodeIndex++;
 			}
 			else
@@ -129,6 +129,14 @@ void NPC::Draw()
 		return;
 
 	_currentAnimation->Draw(Position);
+}
+
+void NPC::Draw(D3DXVECTOR2 offset)
+{
+	if (IsDeleted)
+		return;
+
+	_currentAnimation->Draw(Position, offset);
 }
 
 void NPC::Move(D3DXVECTOR2 destination)

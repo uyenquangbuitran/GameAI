@@ -9,19 +9,14 @@ GridTile::GridTile()
 	color = D3DCOLOR_XRGB(0, 0, 0);
 }
 
-GridTile::GridTile(const GridTile & tile)
-{
-	x = tile.x;
-	y = tile.y;
-	anim = new Animation();
-	anim->addFrameInfo(FrameInfo(SpriteList::Instance()->WhiteTile, 0, 32, 0, 32, D3DXVECTOR2(16.f, 16.f)));
-	position = tile.position;
-	SetType(tile.type);
-}
-
 void GridTile::Draw()
 {
 	anim->Draw(position, D3DXVECTOR2(0.f, 0.f), false, false, color);
+}
+
+void GridTile::Draw(D3DXVECTOR2 offset)
+{
+	anim->Draw(position, offset, false, false, color);
 }
 
 void GridTile::SetType(TileType type)
@@ -30,24 +25,12 @@ void GridTile::SetType(TileType type)
 	switch (type)
 	{
 	case Empty:
-		if (x == 0 && y == 0)
-		{
-			return;
-		}
 		color = D3DCOLOR_XRGB(0, 0, 0); // black
 		break;
 	case Opened:
-		if (x == 0 && y == 0)
-		{
-			return;
-		}
 		color = D3DCOLOR_XRGB(255, 255, 255); // white
 		break;
 	case Closed:
-		if (x == 0 && y == 0)
-		{
-			return;
-		}
 		color = D3DCOLOR_XRGB(128, 128, 128); // grey
 		break;
 	case Obstacle:

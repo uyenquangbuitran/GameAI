@@ -12,7 +12,7 @@ HorizontalFieldScene::HorizontalFieldScene()
 	_player->Position = D3DXVECTOR2(48.f, 48.f);
 
 	begin = GridTile();
-	begin.SetPosition(D3DXVECTOR2(0.f, 0.f));
+	/*begin.SetPosition(D3DXVECTOR2(0.f, 0.f));
 	begin.SetX(0);
 	begin.SetY(0);
 	begin.SetType(Destination);
@@ -20,23 +20,28 @@ HorizontalFieldScene::HorizontalFieldScene()
 	destination = GridTile();
 	destination.SetPosition(D3DXVECTOR2(0.f, 0.f));
 	destination.SetX(WIDTH / X_STEP - 1);
-	destination.SetY(HEIGHT / Y_STEP - 1);
+	destination.SetY(HEIGHT / Y_STEP - 1);*/
 	destination.SetType(Destination);
 
 	destinationNode = new GridTile();
 	*destinationNode = destination;
+
+	camera.Init(GameGlobal::Height, GameGlobal::Width, 0, 10000, 0, 10000);
+	camera.setPosition(D3DXVECTOR2(0.f, 0.f));
+
+	D3DXVECTOR2 offset(GameGlobal::Width / 2.f - camera.Position.x, GameGlobal::Height / 2.f - camera.Position.y);
 
 	for (int x = 0; x < (WIDTH / X_STEP); x++)
 	{
 		for (int y = 0; y < (HEIGHT / Y_STEP); y++)
 		{
 			gridMap[x][y] = new GridTile();
-			gridMap[x][y]->x = x;
-			gridMap[x][y]->y = y;
+			/*gridMap[x][y]->x = x;
+			gridMap[x][y]->y = y;*/
 			gridMap[x][y]->position = D3DXVECTOR2((x + 0.5f) * X_STEP, (y + 0.5f) * Y_STEP);
 
 			//Add obstacles to a drawing list.
-			if (_map->obstaclesNode.count(x + y * (WIDTH / X_STEP)))
+			if (_map->obstaclesNodes.count(x + y * (WIDTH / X_STEP)))
 			{
 				GridTile* tile = gridMap[x][y];
 				tile->SetType(Obstacle);
@@ -70,18 +75,18 @@ HorizontalFieldScene::HorizontalFieldScene()
 
 void HorizontalFieldScene::Update(float dt)
 {
-	if (keyboard[0x31]) // 1 -> normal mode, right click to set destination.
+	if (keyboard[0x31]) // 1 -> change drawing mode.
 	{
 		_isDrawDestinationOnly = !_isDrawDestinationOnly;
 		if (_isDrawMap) GAMELOG("Drawing destination only."); else GAMELOG("Drawing all node.");
 		keyboard[0x31] = false;
 	}
-	else if (keyboard[0x32]) // 2 -> auto mode, right click will auto find path and move tank to destination.
+	else if (keyboard[0x32]) // 2 -> make the first npc in npcList fire.
 	{
 		_npcList[0]->Fire();
 		keyboard[0x32] = false;
 	}
-	else if (keyboard[0x33]) // 3 -> editor mode, left click will set obstacle, right click will remove obstacle.
+	else if (keyboard[0x33]) // 3 -> print bullet position.
 	{
 		GAMELOG("Bullet pos: %f, %f", _bulletList[0]->Position.x, _bulletList[0]->Position.y);
 		keyboard[0x33] = false;
@@ -123,12 +128,32 @@ void HorizontalFieldScene::Update(float dt)
 			GAMELOG("Mouse is deactived!");
 		keyboard[0x46] = false;
 	}
+	else if (keyboard[0x25]) // Left
+	{
+		camera.Position.x += 32.f;
+		keyboard[0x25] = false;
+	}
+	else if (keyboard[0x26]) // Up
+	{
+		camera.Position.y += 32.f;
+		keyboard[0x26] = false;
+	}
+	else if (keyboard[0x27]) // Right
+	{
+		camera.Position.x -= 32.f;
+		keyboard[0x27] = false;
+	}
+	else if (keyboard[0x28]) // Down
+	{
+		camera.Position.y -= 32.f;
+		keyboard[0x28] = false;
+	}
 
 	for (auto bullet : _bulletList)
 		bullet->Update(dt);
 	
 	//Check collision with bricks.
-	for (auto brick : _map->getBrickList())
+	/*for (auto brick : _map->getBrickList())
 	{
 		if (!brick->IsDeleted)
 		{
@@ -142,7 +167,7 @@ void HorizontalFieldScene::Update(float dt)
 			for (auto bullet : _bulletList)
 				bullet->CheckCollision(brick);
 		}
-	}
+	}*/
 
 	for (auto npc : _npcList)
 	{
@@ -243,6 +268,11 @@ void HorizontalFieldScene::OnLeftMouseDown(float x, float y)
 
 void HorizontalFieldScene::OnRightMouseDown(float x, float y)
 {
+	D3DXVECTOR2 offset(GameGlobal::Width / 2.f - camera.Position.x, GameGlobal::Height / 2.f - camera.Position.y);
+
+	//Adjust x and y coordinate with offset when camera moves.
+	x -= offset.x;
+	y -= offset.y;
 	if (!_isMouseActive) return;
 
 	bool isInvalidDestination = false;
@@ -250,7 +280,7 @@ void HorizontalFieldScene::OnRightMouseDown(float x, float y)
 	if (!_isPlayerMoving)
 	{
 		ResetScene();
-		if (gridMap[begin.GetX()][begin.GetY()]->type != Obstacle)
+		/*if (gridMap[begin.GetX()][begin.GetY()]->type != Obstacle)
 			gridMap[begin.GetX()][begin.GetY()]->SetType(Empty);
 		begin.SetPosition(_player->Position);
 		begin.x = int(begin.position.x / float(X_STEP));
@@ -266,12 +296,12 @@ void HorizontalFieldScene::OnRightMouseDown(float x, float y)
 		destination.x = int(x / float(X_STEP));
 		destination.y = int(y / float(Y_STEP));
 		*destinationNode = destination;
-		gridMap[destination.x][destination.y]->SetType(Destination);
+		gridMap[destination.x][destination.y]->SetType(Destination);*/
 
 		UpdateTankNodes();
 		FindPath();
 		DrawPath();
-		if (isInvalidDestination) gridMap[destination.x][destination.y]->SetType(Obstacle);
+		//if (isInvalidDestination) gridMap[destination.x][destination.y]->SetType(Obstacle);
 		_isPlayerMoving = true;
 	}
 	else
@@ -282,7 +312,7 @@ void HorizontalFieldScene::OnRightMouseDown(float x, float y)
 
 		ResetScene();
 
-		if (gridMap[begin.GetX()][begin.GetY()]->type != Obstacle)
+		/*if (gridMap[begin.GetX()][begin.GetY()]->type != Obstacle)
 			gridMap[begin.GetX()][begin.GetY()]->SetType(Empty);
 
 		begin.SetPosition(_player->Position);
@@ -299,12 +329,12 @@ void HorizontalFieldScene::OnRightMouseDown(float x, float y)
 		destination.x = int(x / float(X_STEP));
 		destination.y = int(y / float(Y_STEP));
 		*destinationNode = destination;
-		gridMap[destination.x][destination.y]->SetType(Destination);
+		gridMap[destination.x][destination.y]->SetType(Destination);*/
 
 		UpdateTankNodes();
 		FindPath();
 		DrawPath();
-		if (isInvalidDestination) gridMap[destination.x][destination.y]->SetType(Obstacle);
+		//if (isInvalidDestination) gridMap[destination.x][destination.y]->SetType(Obstacle);
 		_isPlayerMoving = true;
 	}
 }
@@ -327,27 +357,27 @@ void HorizontalFieldScene::ResetScene()
 
 void HorizontalFieldScene::FindPath()
 {
-	CoorNode cbegin = CoorNode(begin.GetX(), begin.GetY());
-	CoorNode cdes = CoorNode(destination.GetX(), destination.GetY());
-	PairNode pair(cbegin, cdes);
+	//CoorNode cbegin = CoorNode(begin.GetX(), begin.GetY());
+	//CoorNode cdes = CoorNode(destination.GetX(), destination.GetY());
+	//PairNode pair(cbegin, cdes);
 
-	std::unordered_map<PairNode, std::vector<GridTile*>>::iterator foundPath = storedPath.find(pair);
-	
-	if (foundPath != storedPath.end())
-	{
-		_player->path.clear();
-		_player->path = foundPath->second;
-		
-		if (foundPath->first.IsReversed(pair))			
-		{
-			//Reverse path.
-			std::reverse(_player->path.begin(), _player->path.end());
-		}
-	}
-	else
-	{
-		RunAStar();
-	}
+	//std::unordered_map<PairNode, std::vector<GridTile*>>::iterator foundPath = storedPath.find(pair);
+	//
+	//if (foundPath != storedPath.end())
+	//{
+	//	_player->path.clear();
+	//	_player->path = foundPath->second;
+	//	
+	//	if (foundPath->first.IsReversed(pair))			
+	//	{
+	//		//Reverse path.
+	//		std::reverse(_player->path.begin(), _player->path.end());
+	//	}
+	//}
+	//else
+	//{
+	//	RunAStar();
+	//}
 }
 
 void HorizontalFieldScene::FindPath(NPC* npc, Node destination)
@@ -382,41 +412,41 @@ void HorizontalFieldScene::FindPath(NPC* npc, Node destination)
 
 void HorizontalFieldScene::RunAStar()
 {
-	_player->path.clear();
-	Node beginNode;
-	//Setting position for begin node.
-	beginNode.SetX(begin.GetX());
-	beginNode.SetY(begin.GetY());
+	//_player->path.clear();
+	//Node beginNode;
+	////Setting position for begin node.
+	//beginNode.SetX(begin.GetX());
+	//beginNode.SetY(begin.GetY());
 
-	Node destNode;
-	destNode.SetX(destination.GetX());
-	destNode.SetY(destination.GetY());
+	//Node destNode;
+	//destNode.SetX(destination.GetX());
+	//destNode.SetY(destination.GetY());
 
-	int id = beginNode.GetX() + beginNode.GetY() * (WIDTH / X_STEP);
-	tankNodes.erase(id);
+	//int id = beginNode.GetX() + beginNode.GetY() * (WIDTH / X_STEP);
+	//tankNodes.erase(id);
 
-	std::vector<Node> result = AStar::aStar(beginNode, destNode, gridMap, _map->obstaclesNode, tankNodes);
+	///*std::vector<Node> result = AStar::aStar(beginNode, destNode, gridMap, _map->obstaclesNodes, tankNodes);
 
-	for (std::vector<Node>::iterator it = result.begin(); it != result.end(); it = std::next(it))
-	{
-		_player->path.emplace_back(gridMap[it->GetX()][it->GetY()]);
-	}
+	//for (std::vector<Node>::iterator it = result.begin(); it != result.end(); it = std::next(it))
+	//{
+	//	_player->path.emplace_back(gridMap[it->GetX()][it->GetY()]);
+	//}*/
 
-	PairNode pair = PairNode(CoorNode(begin.GetX(), begin.GetY()),
-		CoorNode(destination.GetX(), destination.GetY()));
-	storedPath.emplace(pair, _player->path);
+	//PairNode pair = PairNode(CoorNode(begin.GetX(), begin.GetY()),
+	//	CoorNode(destination.GetX(), destination.GetY()));
+	//storedPath.emplace(pair, _player->path);
 }
 
 void HorizontalFieldScene::RunAStar(NPC* npc, Node beginNode, Node destination)
 {
 	npc->path.clear();	
 
-	std::vector<Node> result = AStar::aStar(beginNode, destination, gridMap, _map->obstaclesNode, tankNodes);
+	/*std::vector<Node> result = AStar::aStar(beginNode, destination, gridMap, _map->obstaclesNodes, tankNodes);
 
 	for (std::vector<Node>::iterator it = result.begin(); it != result.end(); it = std::next(it))
 	{
 		npc->path.emplace_back(gridMap[it->GetX()][it->GetY()]);
-	}
+	}*/
 
 	PairNode pair = PairNode(CoorNode(beginNode.GetX(), beginNode.GetY()),
 		CoorNode(destination.GetX(), destination.GetY()));
@@ -462,8 +492,8 @@ void HorizontalFieldScene::GiveNPCPath(NPC* npc)
 	int x, y;
 	if (npc->isRepath)
 	{
-		x = npc->path[npc->path.size() - 1]->GetX();
-		y = npc->path[npc->path.size() - 1]->GetY();
+		/*x = npc->path[npc->path.size() - 1]->GetX();
+		y = npc->path[npc->path.size() - 1]->GetY();*/
 		if (npc->Position == npc->path[npc->currentNodeIndex]->position)
 			npc->currentNodeIndex = 1;
 		npc->isRepath = false;
@@ -552,7 +582,7 @@ bool HorizontalFieldScene::IsValidNPCDestination(int x, int y)
 {
 	int id = x + y * (WIDTH / X_STEP);
 
-	if (!_map->obstaclesNode.count(id) && !tankNodes.count(id)&& !npcsDestination.count(id))
+	if (!_map->obstaclesNodes.count(id) && !tankNodes.count(id)&& !npcsDestination.count(id))
 	{
 		if (x < 0 || y < 0 || x >= (WIDTH / X_STEP) || y >= (HEIGHT / Y_STEP))
 			return false;
@@ -597,6 +627,7 @@ Bullet* HorizontalFieldScene::GetBullet()
 
 void HorizontalFieldScene::Draw()
 {
+	D3DXVECTOR2 offset(GameGlobal::Width / 2.f - camera.Position.x, GameGlobal::Height / 2.f - camera.Position.y);
 	for (int x = 0; x < (WIDTH / X_STEP); x++)
 	{
 		for (int y = 0; y < (HEIGHT / Y_STEP); y++)
@@ -604,38 +635,38 @@ void HorizontalFieldScene::Draw()
 			if (_isDrawDestinationOnly)
 			{
 				if (gridMap[x][y]->type == Destination)
-					gridMap[x][y]->Draw();
+					gridMap[x][y]->Draw(offset);
 			}
 			else
-				gridMap[x][y]->Draw();
+				gridMap[x][y]->Draw(offset);
 		}
 	}
 
 	if (_isDrawMap)
-		_map->Draw();
+		_map->Draw(camera);
 
 	if (_isDrawObstacles)
 	{
 		for (int index = 0; index < drawingObstacles.size(); index++)
-			drawingObstacles[index]->Draw();
+			drawingObstacles[index]->Draw(offset);
 		for (int index = 0; index < drawingTankNodes.size(); index++)
-			drawingTankNodes[index]->Draw();
+			drawingTankNodes[index]->Draw(offset);
 	}
 		
 
 	if (_isDrawPath)
 		for (int index = 0; index < drawingPath.size(); index++)
-			drawingPath[index]->Draw();
+			drawingPath[index]->Draw(offset);
 	
-	destinationNode->Draw();
+	destinationNode->Draw(offset);
 
 	for (auto npc : _npcList)
 	{
-		npc->Draw();
+		npc->Draw(offset);
 	}
 
-	_player->Draw();
+	_player->Draw(offset);
 
 	for (auto bullet : _bulletList)
-		bullet->Draw();
+		bullet->Draw(offset);
 }

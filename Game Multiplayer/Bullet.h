@@ -30,6 +30,7 @@ public:
 	void ApplyVelocity();
 
 	void Draw() override;
+	void Draw(D3DXVECTOR2 offset);
 
 	void addExpolostion(Explosion* e);
 	void SetShotTank(Entity* e) { shotTank = e; }

@@ -1,9 +1,21 @@
 ﻿#pragma once
+#include <vector>
+#include <algorithm>
 
 #include "Entity.h"
 #include "Explosion.h"
 #include "GridTile.h"
 #include "Bullet.h"
+
+enum NPCState
+{
+	NPCS_RunAStar,
+	NPCS_RunDodging,
+	NPCS_RunAttack,
+	NPCS_Attacking,
+	NPCS_RunCollect,
+	NPCS_RunNoAttack
+};
 
 class NPC :public Entity
 {
@@ -36,6 +48,7 @@ public:
 	~NPC() {}
 	void Update(float dt) override;
 	void Draw() override;
+	void Draw(D3DXVECTOR2 offset);
 	void CheckCollision(Entity* entity);
 	bool GetCollisionResult(Entity* entity);
 	void ApplyVelocity();
@@ -45,6 +58,7 @@ public:
 	std::vector<GridTile*> tempPath;
 	int currentNodeIndex = 0;
 	
+	bool hasOrder = false;
 	bool hasPath = false;
 	bool isChangedPath = false;
 	bool isRepath = false;	

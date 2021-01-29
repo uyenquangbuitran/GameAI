@@ -7,6 +7,7 @@
 #include "GameLog.h"
 #include "GameDefine.h"
 #include "GridTile.h"
+#include "AStar.h"
 
 using namespace std;
 
@@ -21,10 +22,15 @@ class Player : public Entity
 
 	const float _time_BetweenShoots = 0.7f;
 	float _count_Shoot = 0.0f;
+
+	float _waittingTime = 0.f;
 	float onPauseTime = 0.f;
 	float pauseTime = 0.f;
+	
 
-	bool _isMoving = false;
+	bool _isMoving = true;
+	bool _isDodging = false;  // avoiding obstacles on path.
+	bool _isCollision = false;
 	bool _isPausing = false;
 
 	std::vector<Explosion*> _explosionList; // trỏ đến
@@ -50,11 +56,14 @@ class Player : public Entity
 	void SetAnimation(Direction _dir);
 	void InitAnimation();
 	void LogPosition() { GAMELOG("(%i, %i)", (int)Position.x, (int)Position.y); }	
+
+	void MovePath(float dt);
 public:
 	Player();
 	~Player() {}
 	void Update(float dt);
 	void Draw();
+	void Draw(D3DXVECTOR2 offset);
 	void DrawArrow();
 	void CheckCollision(Entity* entity);
 	void HandleKeyboard(std::map<int, bool> _keys, float _dt);
@@ -64,6 +73,8 @@ public:
 	int getScore() { return _score; }	
 	std::vector<GridTile*> path;
 	int currentNodeIndex = 0;
+
+	bool hasOrder = false;	
 
 	bool IsMoving() { return _isMoving; }
 	bool IsPause() { return _isPausing; }

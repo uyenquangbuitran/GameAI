@@ -6,7 +6,7 @@
 class GridTile
 {
 protected:
-	int x, y;
+	Vector2D vec;
 	Animation* anim;
 	D3DXVECTOR2 position = D3DXVECTOR2(0.f, 0.f);
 	TileType type;
@@ -14,15 +14,15 @@ protected:
 	int currentNode = 0;
 	friend class GridScene;
 	friend class HorizontalFieldScene;
+	friend class BigScene;
 public:
 	GridTile();
-	GridTile(const GridTile&tile);
 	~GridTile() {};
-	void SetX(int x) { this->x = x; }
-	void SetY(int y) { this->y = y; }
-	int GetX() { return x; }
-	int GetY() { return y; }
+	void SetVec(Vector2D value) { vec = value; }
+	void SetVec(int x, int y) { vec.set(x, y); }
+	Vector2D GetVec() { return vec; }
 	void Draw();
+	void Draw(D3DXVECTOR2 offset);
 	void SetType(TileType type);
 	void SetPosition(D3DXVECTOR2 position) { this->position = position; }
 	D3DXVECTOR2 GetPosition() { return position; }

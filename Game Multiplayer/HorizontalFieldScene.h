@@ -20,6 +20,8 @@
 #include "GameMap.h"
 #include "Water.h"
 
+#include "Camera.h"
+
 
 class HorizontalFieldScene : public Scene
 {	
@@ -27,6 +29,8 @@ class HorizontalFieldScene : public Scene
 	vector<Water*> _waterList;
 	vector<NPC*> _npcList;	
 	vector<Bullet*> _bulletList;
+
+	Camera camera;
 
 	Player* _player;	
 	bool _isPlayerMoving = false;
@@ -58,7 +62,7 @@ class HorizontalFieldScene : public Scene
 	GridTile* GetNPCTempPoint(NPC* npc, Direction direction);		
 	
 public:
-	std::set<int, std::greater <int>> tankNodes;
+	std::set<int, std::greater <int>> tankNodes;	
 
 	HorizontalFieldScene();
 	~HorizontalFieldScene() {};

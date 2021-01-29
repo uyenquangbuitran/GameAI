@@ -13,9 +13,9 @@ public:
 	Brick() {}
 	~Brick()  { delete _animation; }
 
-	void Draw() {
+	void Draw(D3DXVECTOR2 offset) {
 		if (!IsDeleted)
-			_animation->Draw(Position);
+			_animation->Draw(Position, offset);
 	}
 
 // các hàm hỗ trợ

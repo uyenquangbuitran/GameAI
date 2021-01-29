@@ -22,6 +22,9 @@
     <Filter Include="AI">
       <UniqueIdentifier>{1cf9c8ce-cf70-4471-b829-4690001d636a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="AI\AStar">
+      <UniqueIdentifier>{1a45f56e-8b47-45df-b5e5-367141f1f373}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MapReader\tinyxml2.h">
@@ -187,15 +190,6 @@
     <ClInclude Include="GridScene.h">
       <Filter>Scenes</Filter>
     </ClInclude>
-    <ClInclude Include="FibonacciHeap.h">
-      <Filter>AI</Filter>
-    </ClInclude>
-    <ClInclude Include="AStar.h">
-      <Filter>AI</Filter>
-    </ClInclude>
-    <ClInclude Include="GraphNode.h">
-      <Filter>AI</Filter>
-    </ClInclude>
     <ClInclude Include="GridTile.h">
       <Filter>AI</Filter>
     </ClInclude>
@@ -207,6 +201,27 @@
     </ClInclude>
     <ClInclude Include="NPCDecisionMaker.h">
       <Filter>AI</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="BigScene.h">
+      <Filter>Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="MapTile.h">
+      <Filter>AI</Filter>
+    </ClInclude>
+    <ClInclude Include="PairTile.h">
+      <Filter>AI</Filter>
+    </ClInclude>
+    <ClInclude Include="AStar.h">
+      <Filter>AI\AStar</Filter>
+    </ClInclude>
+    <ClInclude Include="FibonacciHeap.h">
+      <Filter>AI\AStar</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphNode.h">
+      <Filter>AI\AStar</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -330,12 +345,6 @@
     <ClCompile Include="GridScene.cpp">
       <Filter>Scenes</Filter>
     </ClCompile>
-    <ClCompile Include="GridTile.cpp">
-      <Filter>AI</Filter>
-    </ClCompile>
-    <ClCompile Include="GraphNode.cpp">
-      <Filter>AI</Filter>
-    </ClCompile>
     <ClCompile Include="HorizontalFieldScene.cpp">
       <Filter>Scenes</Filter>
     </ClCompile>
@@ -344,6 +353,18 @@
     </ClCompile>
     <ClCompile Include="NPCDecisionMaker.cpp">
       <Filter>AI</Filter>
+    </ClCompile>
+    <ClCompile Include="BigScene.cpp">
+      <Filter>Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="AStar.cpp">
+      <Filter>AI\AStar</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphNode.cpp">
+      <Filter>AI\AStar</Filter>
+    </ClCompile>
+    <ClCompile Include="GridTile.cpp">
+      <Filter>AI\AStar</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

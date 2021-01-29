@@ -8,7 +8,7 @@ GridScene::GridScene()
 	player = new Player();
 	player->Position = D3DXVECTOR2(16.f, 16.f);
 
-	begin = GridTile();
+	/*begin = GridTile();
 	begin.SetPosition(D3DXVECTOR2(0.f, 0.f));	
 	begin.SetX(0);
 	begin.SetY(0);
@@ -18,15 +18,15 @@ GridScene::GridScene()
 	destination.SetPosition(D3DXVECTOR2(0.f, 0.f));
 	destination.SetX(WIDTH / X_STEP - 1);
 	destination.SetY(HEIGHT / Y_STEP - 1);
-	destination.SetType(Destination);
+	destination.SetType(Destination);*/
 
 	for (int x = 0; x < (WIDTH / X_STEP); x++)
 	{
 		for (int y = 0; y < (HEIGHT / Y_STEP); y++)
 		{			
 			map[x][y] = new GridTile();
-			map[x][y]->x = x;
-			map[x][y]->y = y;
+			/*map[x][y]->x = x;
+			map[x][y]->y = y;*/
 			map[x][y]->position = D3DXVECTOR2((x + 0.5f) * X_STEP, (y + 0.5f) * Y_STEP);
 
 			/*
@@ -150,7 +150,7 @@ void GridScene::OnRightMouseDown(float x, float y)
 	switch (mode)
 	{
 	case 1:
-		map[begin.GetX()][begin.GetY()]->SetType(Empty);
+		/*map[begin.GetX()][begin.GetY()]->SetType(Empty);
 		begin.SetPosition(player->Position);
 		begin.x = int(begin.position.x / float(X_STEP));
 		begin.y = int(begin.position.y / float(Y_STEP));
@@ -167,7 +167,7 @@ void GridScene::OnRightMouseDown(float x, float y)
 		else
 		{
 			GAMELOG("Invalid destination!");
-		}
+		}*/
 		
 		break;
 
@@ -175,7 +175,7 @@ void GridScene::OnRightMouseDown(float x, float y)
 		if (!_isPlayerMoving)
 		{
 			ResetScene();
-			map[begin.GetX()][begin.GetY()]->SetType(Empty);
+			/*map[begin.GetX()][begin.GetY()]->SetType(Empty);
 			begin.SetPosition(player->Position);
 			begin.x = int(begin.position.x / float(X_STEP));
 			begin.y = int(begin.position.y / float(Y_STEP));
@@ -189,11 +189,11 @@ void GridScene::OnRightMouseDown(float x, float y)
 			destination.SetPosition(D3DXVECTOR2(x, y));
 			destination.x = int(x / float(X_STEP));
 			destination.y = int(y / float(Y_STEP));
-			map[destination.x][destination.y]->SetType(Destination);
+			map[destination.x][destination.y]->SetType(Destination);*/
 
 			RunAStar();
 			DrawPath();
-			if (isInvalidDestination) map[destination.x][destination.y]->SetType(Obstacle);
+			//if (isInvalidDestination) map[destination.x][destination.y]->SetType(Obstacle);
 			_isPlayerMoving = true;
 		}
 		else
@@ -203,7 +203,7 @@ void GridScene::OnRightMouseDown(float x, float y)
 			currentNodeIndex = 0;
 
 			ResetScene();
-			map[begin.GetX()][begin.GetY()]->SetType(Empty);
+			/*map[begin.GetX()][begin.GetY()]->SetType(Empty);
 			begin.SetPosition(player->Position);
 			begin.x = int(begin.position.x / float(X_STEP));
 			begin.y = int(begin.position.y / float(Y_STEP));
@@ -221,7 +221,7 @@ void GridScene::OnRightMouseDown(float x, float y)
 
 			RunAStar();
 			DrawPath();
-			if (isInvalidDestination) map[destination.x][destination.y]->SetType(Obstacle);
+			if (isInvalidDestination) map[destination.x][destination.y]->SetType(Obstacle);*/
 			_isPlayerMoving = true;
 		}
 		break;
@@ -275,12 +275,12 @@ void GridScene::RunAStar()
 	player->path.clear();
 	Node beginNode;
 	//Setting position for begin node.
-	beginNode.SetX(begin.GetX());
+	/*beginNode.SetX(begin.GetX());
 	beginNode.SetY(begin.GetY());
 
 	Node destNode;
 	destNode.SetX(destination.GetX());
-	destNode.SetY(destination.GetY());
+	destNode.SetY(destination.GetY());*/
 	/*std::vector<Node> result = AStar::aStar(beginNode, destNode, map);
  	for (std::vector<Node>::iterator it = result.begin(); it != result.end(); it = std::next(it))
 	{

@@ -11,8 +11,8 @@ BattleScene::BattleScene()
 		for (int y = 0; y < (HEIGHT / Y_STEP); y++)
 		{
 			map[x][y] = new GridTile();
-			map[x][y]->SetX(x);
-			map[x][y]->SetY(y);
+			/*map[x][y]->SetX(x);
+			map[x][y]->SetY(y);*/
 			map[x][y]->SetPosition(D3DXVECTOR2((x + 0.5f) * X_STEP, (y + 0.5f) * Y_STEP));
 
 			
@@ -110,18 +110,18 @@ void BattleScene::Update(float dt)
 	}
 
 	// sau khi có tọa độ mới tại frame này thì check va chạm với gạch
-	for (auto brick : _map->getBrickList())
-	{
-		if (!brick->IsDeleted)
-		{
-			_player->CheckCollision(brick);
+	//for (auto brick : _map->getBrickList())
+	//{
+	//	if (!brick->IsDeleted)
+	//	{
+	//		_player->CheckCollision(brick);
 
-			for (auto npc : _npcList) // npcs va chạm bricks
-			{
-				npc->CheckCollision(brick);
-			}
-		}
-	}
+	//		for (auto npc : _npcList) // npcs va chạm bricks
+	//		{
+	//			npc->CheckCollision(brick);
+	//		}
+	//	}
+	//}
 
 	// update các object còn lại
 	{
@@ -152,7 +152,7 @@ void BattleScene::Draw()
 		npc->Draw();
 	}
 
-	_waterBrick->Draw();
+	/*_waterBrick->Draw();*/
 
 	_map->Draw();
 

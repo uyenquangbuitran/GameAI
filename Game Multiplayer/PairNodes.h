@@ -3,7 +3,7 @@
 
 class CoorNode
 {
-	int x, y;	
+	int x, y;
 public:
 	CoorNode() { x = 0; y = 0; }
 	CoorNode(int _x, int _y) : x(_x), y(_y) {}

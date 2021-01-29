@@ -112,6 +112,14 @@ void Bullet::Draw()
 	_currentAnimation->Draw(Position);
 }
 
+void Bullet::Draw(D3DXVECTOR2 offset)
+{
+	if (IsDeleted)
+		return;
+
+	_currentAnimation->Draw(Position, offset);
+}
+
 void Bullet::addExpolostion(Explosion* e)
 {
 	explosionList.emplace_back(e);
