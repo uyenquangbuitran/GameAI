@@ -10,6 +10,10 @@
 #include "GameTime.h"
 #include "SceneManager.h"
 #include "Game.h"
+#include "GraphicsDevice.h"
+
+#include <stdlib.h>    
+#include <time.h>       /* time */
 
 using namespace std;
 
@@ -19,18 +23,21 @@ using namespace std;
 #define KEYBOARD_BUFFERD_SIZE 1024
 
 int InitWindow(int cmdShow);
-int InitDevice();
+//int InitDevice();
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-LPDIRECT3D9             _direct3D9;
-LPD3DXSPRITE            _spriteHandler;
-PDIRECT3D9              _d3d;
-LPDIRECT3DDEVICE9       _device;
+//LPDIRECT3D9             _direct3D9;
+//LPD3DXSPRITE            _spriteHandler;
+//PDIRECT3D9              _d3d;
+//LPDIRECT3DDEVICE9       _device;
 HINSTANCE               _hInstance;
 int                     _cmdShow;
 
+GraphicsDevice *device;
+
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int cmdShow)
 {
+	srand(time(0));
 	_hInstance = hInstance;
 	InitWindow(cmdShow);
 
@@ -54,17 +61,14 @@ int InitWindow(int cmdShow)
 	wc.hIconSm = NULL;
 	RegisterClassEx(&wc);
 
-	RECT wr = { 0, 0, GameGlobal::Width, GameGlobal::Height };
-	AdjustWindowRect(&wr, WS_OVERLAPPEDWINDOW, FALSE);
-
 	HWND hWnd = CreateWindow(
 		WIN_NAME,
 		WIN_NAME,
 		WS_OVERLAPPEDWINDOW,
 		116,
 		40,
-		wr.right - wr.left,
-		wr.bottom - wr.top,
+		GameGlobal::Width,
+		GameGlobal::Height,
 		NULL,
 		NULL,
 		_hInstance,
@@ -76,48 +80,50 @@ int InitWindow(int cmdShow)
 	ShowWindow(hWnd, cmdShow);
 	UpdateWindow(hWnd);
 
-	if (InitDevice())
+	device = new GraphicsDevice();
+
+	if (device->InitDevice())
 	{
-		Game *game = new Game();
+		Game *game = new Game(device);
 	}
 
 	return 0;
 }
 
-int InitDevice()
-{
-	_d3d = Direct3DCreate9(D3D_SDK_VERSION);
-	D3DPRESENT_PARAMETERS d3dpp;
-
-	ZeroMemory(&d3dpp, sizeof(d3dpp));
-
-	d3dpp.Windowed = TRUE;
-	d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
-	d3dpp.BackBufferFormat = D3DFMT_A8R8G8B8;
-	d3dpp.BackBufferCount = 1;
-	d3dpp.BackBufferWidth = GameGlobal::Width;
-	d3dpp.BackBufferHeight = GameGlobal::Height;
-
-	HRESULT dvresult = _d3d->CreateDevice(D3DADAPTER_DEFAULT,
-		D3DDEVTYPE_HAL,
-		GameGlobal::Window,
-		D3DCREATE_SOFTWARE_VERTEXPROCESSING,
-		&d3dpp,
-		&_device);
-	GameGlobal::Device = _device;
-
-	D3DXCreateSprite(GameGlobal::Device, &_spriteHandler);
-	GameGlobal::XSprite = _spriteHandler;
-
-	return 1;
-}
+//int InitDevice()
+//{
+//	_d3d = Direct3DCreate9(D3D_SDK_VERSION);
+//	D3DPRESENT_PARAMETERS d3dpp;
+//
+//	ZeroMemory(&d3dpp, sizeof(d3dpp));
+//
+//	d3dpp.Windowed = TRUE;
+//	d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
+//	d3dpp.BackBufferFormat = D3DFMT_A8R8G8B8;
+//	d3dpp.BackBufferCount = 1;
+//	d3dpp.BackBufferWidth = GameGlobal::Width;
+//	d3dpp.BackBufferHeight = GameGlobal::Height;
+//
+//	HRESULT dvresult = _d3d->CreateDevice(D3DADAPTER_DEFAULT,
+//		D3DDEVTYPE_HAL,
+//		GameGlobal::Window,
+//		D3DCREATE_SOFTWARE_VERTEXPROCESSING,
+//		&d3dpp,
+//		&_device);
+//	GameGlobal::Device = _device;
+//
+//	D3DXCreateSprite(GameGlobal::Device, &_spriteHandler);
+//	GameGlobal::XSprite = _spriteHandler;
+//
+//	return 1;
+//}
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
 	{
 	case WM_DESTROY:
-		GameGlobal::IsGameRunning = false;	
+		GameGlobal::IsGameRunning = false;
 		PostQuitMessage(0);
 		break;
 
@@ -137,7 +143,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		SceneManager::Instance()->GetCurrentScene()->OnLeftMouseUp((float)GET_X_LPARAM(lParam),
 			(float)GET_Y_LPARAM(lParam));
 		break;
-		
+
 	case WM_RBUTTONDOWN:
 		SceneManager::Instance()->GetCurrentScene()->OnRightMouseDown((float)GET_X_LPARAM(lParam),
 			(float)GET_Y_LPARAM(lParam));

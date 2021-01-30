@@ -15,13 +15,18 @@ class Player : public Entity
 {
 	const float _speed = 130.f;
 	Direction _direction = D_Stand;
+	Direction _shotDirection = D_Stand;
 	bool _isShield = false;
 	int _level = 1;
 	int _score = 0;
 	int _color_Position = 0;
+	int _maxHP = 10;
 
 	const float _time_BetweenShoots = 0.7f;
+
+	float _shieldedTime = 0.f;
 	float _count_Shoot = 0.0f;
+	int _currentBullet;
 
 	float _waittingTime = 0.f;
 	float onPauseTime = 0.f;
@@ -31,7 +36,9 @@ class Player : public Entity
 	bool _isMoving = true;
 	bool _isDodging = false;  // avoiding obstacles on path.
 	bool _isCollision = false;
-	bool _isPausing = false;
+	bool _isRunningAStar = false;
+
+	Vector2D* _lastDestPos = new Vector2D();
 
 	std::vector<Explosion*> _explosionList; // trỏ đến
 
@@ -58,7 +65,13 @@ class Player : public Entity
 	void LogPosition() { GAMELOG("(%i, %i)", (int)Position.x, (int)Position.y); }	
 
 	void MovePath(float dt);
+	void RunAStar();
+	void RunRandom();
+	void RunDodging();
+	void PathAStar(int x, int y);
 public:
+	std::vector<Bullet*> _bulletList;
+
 	Player();
 	~Player() {}
 	void Update(float dt);
@@ -77,9 +90,8 @@ public:
 	bool hasOrder = false;	
 
 	bool IsMoving() { return _isMoving; }
-	bool IsPause() { return _isPausing; }
 
 	void Move(D3DXVECTOR2 destination);
 	void Stop();
-	void Pause(float delayAmount = 0.15f);
+	void SetPosition(float x, float y);
 };

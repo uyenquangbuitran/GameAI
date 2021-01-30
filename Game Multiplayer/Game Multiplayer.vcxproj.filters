@@ -25,6 +25,12 @@
     <Filter Include="AI\AStar">
       <UniqueIdentifier>{1a45f56e-8b47-45df-b5e5-367141f1f373}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game Objects\NPC">
+      <UniqueIdentifier>{d0af4f82-6fa0-478f-aebe-7e90f176b8f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game Objects\Player">
+      <UniqueIdentifier>{f10322bc-f5c5-458a-b0d2-2ac8c7683260}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MapReader\tinyxml2.h">
@@ -108,13 +114,7 @@
     <ClInclude Include="Water.h">
       <Filter>Game Objects\Bricks</Filter>
     </ClInclude>
-    <ClInclude Include="NPC.h">
-      <Filter>Game Objects</Filter>
-    </ClInclude>
     <ClInclude Include="Pointed.h">
-      <Filter>Game Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="Player.h">
       <Filter>Game Objects</Filter>
     </ClInclude>
     <ClInclude Include="Bullet.h">
@@ -134,9 +134,6 @@
     </ClInclude>
     <ClInclude Include="ProtectItem.h">
       <Filter>Game Objects\Item</Filter>
-    </ClInclude>
-    <ClInclude Include="Eagle.h">
-      <Filter>Game Objects</Filter>
     </ClInclude>
     <ClInclude Include="Scene.h">
       <Filter>Scenes</Filter>
@@ -181,20 +178,11 @@
     <ClInclude Include="GameMap.h">
       <Filter>Scenes</Filter>
     </ClInclude>
-    <ClInclude Include="BattleScene.h">
-      <Filter>Scenes</Filter>
-    </ClInclude>
     <ClInclude Include="Entity.h">
       <Filter>Framework</Filter>
     </ClInclude>
-    <ClInclude Include="GridScene.h">
-      <Filter>Scenes</Filter>
-    </ClInclude>
     <ClInclude Include="GridTile.h">
       <Filter>AI</Filter>
-    </ClInclude>
-    <ClInclude Include="HorizontalFieldScene.h">
-      <Filter>Scenes</Filter>
     </ClInclude>
     <ClInclude Include="PairNodes.h">
       <Filter>AI</Filter>
@@ -211,9 +199,6 @@
     <ClInclude Include="MapTile.h">
       <Filter>AI</Filter>
     </ClInclude>
-    <ClInclude Include="PairTile.h">
-      <Filter>AI</Filter>
-    </ClInclude>
     <ClInclude Include="AStar.h">
       <Filter>AI\AStar</Filter>
     </ClInclude>
@@ -222,6 +207,36 @@
     </ClInclude>
     <ClInclude Include="GraphNode.h">
       <Filter>AI\AStar</Filter>
+    </ClInclude>
+    <ClInclude Include="NPC.h">
+      <Filter>Game Objects\NPC</Filter>
+    </ClInclude>
+    <ClInclude Include="Eagle.h">
+      <Filter>Game Objects\Bricks</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>Game Objects\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="NPCHunter.h">
+      <Filter>Game Objects\NPC</Filter>
+    </ClInclude>
+    <ClInclude Include="NPCGuard.h">
+      <Filter>Game Objects\NPC</Filter>
+    </ClInclude>
+    <ClInclude Include="NPCTanker.h">
+      <Filter>Game Objects\NPC</Filter>
+    </ClInclude>
+    <ClInclude Include="HealItem.h">
+      <Filter>Game Objects\Item</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerHunter.h">
+      <Filter>Game Objects\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerGuard.h">
+      <Filter>Game Objects\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsDevice.h">
+      <Filter>Framework</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -290,12 +305,6 @@
     <ClCompile Include="MapReader\tinyxml2.cpp">
       <Filter>Framework\Map Reader</Filter>
     </ClCompile>
-    <ClCompile Include="NPC.cpp">
-      <Filter>Game Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="Player.cpp">
-      <Filter>Game Objects</Filter>
-    </ClCompile>
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Animation.cpp">
       <Filter>Framework</Filter>
@@ -336,17 +345,8 @@
     <ClCompile Include="GameMap.cpp">
       <Filter>Scenes</Filter>
     </ClCompile>
-    <ClCompile Include="BattleScene.cpp">
-      <Filter>Scenes</Filter>
-    </ClCompile>
     <ClCompile Include="Entity.cpp">
       <Filter>Framework</Filter>
-    </ClCompile>
-    <ClCompile Include="GridScene.cpp">
-      <Filter>Scenes</Filter>
-    </ClCompile>
-    <ClCompile Include="HorizontalFieldScene.cpp">
-      <Filter>Scenes</Filter>
     </ClCompile>
     <ClCompile Include="Bullet.cpp">
       <Filter>Game Objects</Filter>
@@ -365,6 +365,15 @@
     </ClCompile>
     <ClCompile Include="GridTile.cpp">
       <Filter>AI\AStar</Filter>
+    </ClCompile>
+    <ClCompile Include="NPC.cpp">
+      <Filter>Game Objects\NPC</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Game Objects\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Framework</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

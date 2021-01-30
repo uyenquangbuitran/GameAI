@@ -5,14 +5,13 @@
 
 class Node
 {
+public:
 	int x, y;
 	int parentX, parentY;
 	float gCost;
 	float hCost;
 	float fCost;
 	int status = 0;
-	//GridTile value;
-	friend class AStar;
 public:
 	int GetX() { return x; }
 	int GetY() { return y; }

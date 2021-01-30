@@ -7,9 +7,9 @@ class Eagle:public Entity
 	Animation* _animation;
 
 public:
-	Eagle(D3DXVECTOR2 position, int color = 0)
+	Eagle(D3DXVECTOR2 position, int color = 0, EntityType type = ET_EaglePlayer)
 	{
-		_type = ET_Eagle;
+		_type = type;
 		Position = position;
 		_width = 50;
 		_height = 50;
@@ -39,10 +39,14 @@ public:
 
 	void Draw()
 	{
-		if (IsDeleted) 
-			return;
-
+		if (IsDeleted) return;
 		_animation->Draw(Position);
+	}
+
+	void Draw(D3DXVECTOR2 offset)
+	{
+		if (IsDeleted) return;
+		_animation->Draw(Position, offset);
 	}
 };
 

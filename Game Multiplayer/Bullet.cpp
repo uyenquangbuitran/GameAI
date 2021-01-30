@@ -30,6 +30,8 @@ Bullet::Bullet()
 
 void Bullet::Update(float _dt)
 {
+	_explosion.Update(_dt);
+
 	if (IsDeleted)
 		return;
 
@@ -38,25 +40,72 @@ void Bullet::Update(float _dt)
 
 void Bullet::CheckCollision(Entity* e)
 {
+	if (e->IsDeleted) return;
 	if (IsDeleted) return;
+
+	if (!CanCollision(e)) return;
+	if (e->getType() == ET_Bullet) return;
 
 	CollisionResult cR = GameCollision::getCollisionResult(this, e);
 	if (cR.IsCollided)
-		MakeCollision(e);
+	{
+		switch (e->getType())
+		{
+		case ET_Boundary:			
+		case ET_MetalBrick:
+			SpawnExplosion();
+			break;
+		case ET_NormalBrick:
+			e->Damage();
+			if (e->IsDeleted)
+				AStar::getInstance()->SetValue(e->Position.x / X_STEP, e->Position.y / Y_STEP, 0);
+			SpawnExplosion();
+			break;
+		case ET_NPC:
+			if (shooterType == ET_Player)
+			{
+				e->Damage();
+				if (e->IsDeleted)
+					AStar::getInstance()->SetValue(e->Position.x / X_STEP, e->Position.y / Y_STEP, 0);
+				SpawnExplosion();
+			}
+			break;
+		case ET_Player:
+			if (shooterType == ET_NPC)
+			{
+				e->Damage();
+				if (e->IsDeleted)
+					AStar::getInstance()->SetValue(e->Position.x / X_STEP, e->Position.y / Y_STEP, 0);
+				SpawnExplosion();
+			}
+			break;
+		case ET_EaglePlayer:
+			if (shooterType == ET_NPC)
+			{
+				e->Damage();
+				if (e->IsDeleted)
+					AStar::getInstance()->SetValue(e->Position.x / X_STEP, e->Position.y / Y_STEP, 0);
+				SpawnExplosion();
+			}
+			break;
+		case ET_EagleNPC:
+			if (shooterType == ET_Player)
+			{
+				e->Damage();
+				if (e->IsDeleted)
+					AStar::getInstance()->SetValue(e->Position.x / X_STEP, e->Position.y / Y_STEP, 0);
+				SpawnExplosion();
+			}
+			break;
+		default:
+			break;
+		}
+	}
 }
 
 void Bullet::MakeCollision(Entity* e)
 {
 	IsDeleted = true;
-
-	if (dynamic_cast<BrickNormal*>(e))
-		e->IsDeleted = true; //Destroy brick.
-
-	if (dynamic_cast<Player*>(e) && e != shotTank)
-		e->IsDeleted = true; // Need a function to damage player instead of destroying it.
-
-	if (dynamic_cast<NPC*>(e) && e != shotTank)
-		e->IsDeleted = true; // NPC need a damage function as well.
 }
 
 void Bullet::setDirection(Direction _dir)
@@ -106,21 +155,23 @@ void Bullet::ApplyVelocity()
 
 void Bullet::Draw()
 {
-	if (IsDeleted)
-		return;
-
+	_explosion.Draw();	
+	if (IsDeleted) return;
 	_currentAnimation->Draw(Position);
 }
 
 void Bullet::Draw(D3DXVECTOR2 offset)
 {
-	if (IsDeleted)
-		return;
-
+	_explosion.Draw();
+	if (IsDeleted) return;
 	_currentAnimation->Draw(Position, offset);
 }
 
-void Bullet::addExpolostion(Explosion* e)
+void Bullet::Shoot(D3DXVECTOR2 pos, Direction dir, EntityType _shooterType)
 {
-	explosionList.emplace_back(e);
+	Position = pos;
+	setDirection(dir);
+	IsDeleted = false;
+	shooterType = _shooterType;
+	ApplyVelocity();
 }

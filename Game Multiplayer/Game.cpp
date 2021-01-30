@@ -3,18 +3,25 @@
 #include "GameGlobal.h"
 #include "SceneManager.h"
 #include "GameLog.h"
-//#include "BattleScene.h"
-#include "GridScene.h"
-#include "HorizontalFieldScene.h"
 #include "BigScene.h"
 #include <stdio.h>
 
-Game::Game()
+//Game::Game()
+//{
+//	SceneManager::Instance()->ReplaceScene(new BattleScene());
+//	//SceneManager::Instance()->ReplaceScene(new AStarScene());
+//
+//	InitLoop();
+//}
+
+Game::Game(GraphicsDevice* gDevice)
 {
-	//SceneManager::Instance()->ReplaceScene(new BattleScene());
-	//SceneManager::Instance()->ReplaceScene(new GridScene());
-	//SceneManager::Instance()->ReplaceScene(new HorizontalFieldScene());
-	SceneManager::Instance()->ReplaceScene(new BigScene());
+	BigScene *scene = new BigScene();
+	scene->InitCamera(gDevice);
+	SceneManager::Instance()->ReplaceScene(scene);
+
+	//SceneManager::Instance()->ReplaceScene(new AStarScene());
+
 	InitLoop();
 }
 

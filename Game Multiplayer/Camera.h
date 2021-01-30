@@ -1,59 +1,43 @@
-﻿#pragma once
-#include <d3dx9.h>
-#include <d3d9.h>
+﻿#ifndef CAMERA_H
+#define CAMERA_H
+
+#include <DirectXMath.h>
+#include "Entity.h"
+
+class GraphicsDevice;
 
 class Camera
 {
 public:
-	D3DXVECTOR2 Position;
-	int ScreenHeight;
-	int ScreenWidth;
-	int LeftLimit;
-	int RightLimit;
-	int TopLimit;
-	int BottomLimit;
+	//Constructors and Destructor
+	Camera(GraphicsDevice* gDevice, int width, int height, float angle, DirectX::XMFLOAT3 scaleFactors);
+	~Camera();
 
-	void Init(int _height, int _width, int _left, int _right, int _top, int _bottom)
-	{
-		ScreenHeight = _height;
-		ScreenWidth = _width;
-		LeftLimit = _left;
-		RightLimit = _right;
-		TopLimit = _top;
-		BottomLimit = _bottom;
-	}
+	//Game Functions
+	void Update();
+	void Follow(Entity *following);
+	void Unfollow();
+	bool IsFollowing() const;
+	void SetTransform(GraphicsDevice *gDevice);
+	void Draw();
 
-	void setPosition(const D3DXVECTOR2& _position)
-	{
-		Position = _position;
+private:
+	float angle;
+	DirectX::XMFLOAT3 scaleFactors;
+	D3DXMATRIX orthographicMatrix;
+	D3DXMATRIX identityMatrix;
+	D3DXMATRIX viewMatrix;
 
-		if (Position.x < LeftLimit + ScreenWidth / 2.f)
-		{
-			Position.x = LeftLimit + ScreenWidth / 2.f;
-		}
-		else if (Position.x > RightLimit - ScreenWidth / 2.f)
-		{
-			Position.x = RightLimit - ScreenWidth / 2.f;
-		}
+	Entity *following;
+	GraphicsDevice* _gDevice;
 
-		if (Position.y < TopLimit + ScreenHeight / 2.f)
-		{
-			Position.y = TopLimit + ScreenHeight / 2.f;
-		}
-		else if (Position.y > BottomLimit - ScreenHeight / 2.f)
-		{
-			Position.y = BottomLimit - ScreenHeight / 2.f;
-		}
-	}
 
-	RECT getBound()
-	{
-		RECT _rect;
-		_rect.left = Position.x - ScreenWidth / 2.f;
-		_rect.right = Position.x + ScreenWidth / 2.f;
-		_rect.top = Position.y - ScreenHeight / 2.f;
-		_rect.bottom = Position.y + ScreenHeight / 2.f;
+public:
+	int width;
+	int height;
 
-		return _rect;
-	}
+	int posX;
+	int posY;
 };
+
+#endif /* CAMERA_H */

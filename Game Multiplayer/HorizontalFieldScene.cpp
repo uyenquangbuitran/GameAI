@@ -41,12 +41,12 @@ HorizontalFieldScene::HorizontalFieldScene()
 			gridMap[x][y]->position = D3DXVECTOR2((x + 0.5f) * X_STEP, (y + 0.5f) * Y_STEP);
 
 			//Add obstacles to a drawing list.
-			if (_map->obstaclesNodes.count(x + y * (WIDTH / X_STEP)))
+			/*if (_map->obstaclesNodes.count(x + y * (WIDTH / X_STEP)))
 			{
 				GridTile* tile = gridMap[x][y];
 				tile->SetType(Obstacle);
 				drawingObstacles.emplace_back(tile);				
-			}				
+			}		*/		
 		}
 	}
 
@@ -83,7 +83,7 @@ void HorizontalFieldScene::Update(float dt)
 	}
 	else if (keyboard[0x32]) // 2 -> make the first npc in npcList fire.
 	{
-		_npcList[0]->Fire();
+		//_npcList[0]->Fire();
 		keyboard[0x32] = false;
 	}
 	else if (keyboard[0x33]) // 3 -> print bullet position.
@@ -171,7 +171,7 @@ void HorizontalFieldScene::Update(float dt)
 
 	for (auto npc : _npcList)
 	{
-		if (!npc->hasPath)
+		/*if (!npc->hasPath)
 		{			
 			GiveNPCPath(npc);
 			npc->hasPath = true;
@@ -248,7 +248,7 @@ void HorizontalFieldScene::Update(float dt)
 			}
 
 			_player->Pause(0.65f);
-		}
+		}*/
 
 		npc->Update(dt);
 	}
@@ -394,14 +394,14 @@ void HorizontalFieldScene::FindPath(NPC* npc, Node destination)
 	std::unordered_map<PairNode, std::vector<GridTile*>>::iterator foundPath = storedPath.find(pair);
 	if (foundPath != storedPath.end())
 	{
-		npc->path.clear();
-		npc->path = foundPath->second;
+		//npc->path.clear();
+		//npc->path = foundPath->second;
 
-		if (foundPath->first.IsReversed(pair))
-		{
-			//Reverse path.
-			std::reverse(npc->path.begin(), npc->path.end());
-		}
+		//if (foundPath->first.IsReversed(pair))
+		//{
+		//	//Reverse path.
+		//	std::reverse(npc->path.begin(), npc->path.end());
+		//}
 	}
 	else
 	{
@@ -439,7 +439,7 @@ void HorizontalFieldScene::RunAStar()
 
 void HorizontalFieldScene::RunAStar(NPC* npc, Node beginNode, Node destination)
 {
-	npc->path.clear();	
+	//npc->path.clear();	
 
 	/*std::vector<Node> result = AStar::aStar(beginNode, destination, gridMap, _map->obstaclesNodes, tankNodes);
 
@@ -450,7 +450,7 @@ void HorizontalFieldScene::RunAStar(NPC* npc, Node beginNode, Node destination)
 
 	PairNode pair = PairNode(CoorNode(beginNode.GetX(), beginNode.GetY()),
 		CoorNode(destination.GetX(), destination.GetY()));
-	storedPath.emplace(pair, npc->path);
+	//storedPath.emplace(pair, npc->path);
 }
 
 void HorizontalFieldScene::DrawPath()
@@ -469,8 +469,8 @@ void HorizontalFieldScene::DrawPath()
 
 void HorizontalFieldScene::GivePlayerOrder()
 {
-	if (_player->IsPause())
-		return;
+	/*if (_player->IsPause())
+		return;*/
 
 	if (_isPlayerMoving)
 	{
@@ -490,33 +490,33 @@ void HorizontalFieldScene::GivePlayerOrder()
 void HorizontalFieldScene::GiveNPCPath(NPC* npc)
 {	
 	int x, y;
-	if (npc->isRepath)
-	{
-		/*x = npc->path[npc->path.size() - 1]->GetX();
-		y = npc->path[npc->path.size() - 1]->GetY();*/
-		if (npc->Position == npc->path[npc->currentNodeIndex]->position)
-			npc->currentNodeIndex = 1;
-		npc->isRepath = false;
-	}
-	else
-	{
-		//Generate npc destination
-		do
-		{
-			x = rand() % 30;
-			y = rand() % 15;
-		} while (!IsValidNPCDestination(x, y));	
-	}
+	//if (npc->isRepath)
+	//{
+	//	/*x = npc->path[npc->path.size() - 1]->GetX();
+	//	y = npc->path[npc->path.size() - 1]->GetY();*/
+	//	if (npc->Position == npc->path[npc->currentNodeIndex]->position)
+	//		npc->currentNodeIndex = 1;
+	//	npc->isRepath = false;
+	//}
+	//else
+	//{
+	//	//Generate npc destination
+	//	do
+	//	{
+	//		x = rand() % 30;
+	//		y = rand() % 15;
+	//	} while (!IsValidNPCDestination(x, y));	
+	//}
 
 	Node npcDes;
-	npcDes.SetX(x); npcDes.SetY(y);
+	/*npcDes.SetX(x); npcDes.SetY(y);*/
 	UpdateTankNodes();
 	FindPath(npc, npcDes);
 }
 
 NPC* HorizontalFieldScene::FindChangePathNPC(NPC* npc1, NPC* npc2)
 {
-	if (npc1->isChangedPath)
+	/*if (npc1->isChangedPath)
 		return npc1;
 	if (npc2->isChangedPath)
 		return npc2;
@@ -538,7 +538,8 @@ NPC* HorizontalFieldScene::FindChangePathNPC(NPC* npc1, NPC* npc2)
 	float d2 = (dx2 != 0) ? dx2 : dy2;	
 
 	if (d1 > d2) return npc1;
-	else return npc2;
+	else return npc2;*/
+	return nullptr;
 }
 
 GridTile* HorizontalFieldScene::GetNPCTempPoint(NPC* npc, Direction direction)
@@ -582,12 +583,12 @@ bool HorizontalFieldScene::IsValidNPCDestination(int x, int y)
 {
 	int id = x + y * (WIDTH / X_STEP);
 
-	if (!_map->obstaclesNodes.count(id) && !tankNodes.count(id)&& !npcsDestination.count(id))
+	/*if (!_map->obstaclesNodes.count(id) && !tankNodes.count(id)&& !npcsDestination.count(id))
 	{
 		if (x < 0 || y < 0 || x >= (WIDTH / X_STEP) || y >= (HEIGHT / Y_STEP))
 			return false;
 		return true;
-	}
+	}*/
 	return false;
 }
 

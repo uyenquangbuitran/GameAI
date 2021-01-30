@@ -6,9 +6,10 @@
 class Bullet : public Entity
 {
 	const float _speed = 400.f;
-	Direction _direction;	// hướng bay
+	Direction _direction;	// hướng bay	
 
-	std::vector<Explosion*> explosionList; // trỏ đến
+	EntityType shooterType;
+	Explosion _explosion = new Explosion(false);
 	
 	Animation* _leftAnimation;
 	Animation* _rightAnimation;
@@ -23,6 +24,12 @@ public:
 
 	void Update(float _dt) override;
 
+	void SpawnExplosion()
+	{
+		IsDeleted = true;
+		_explosion.Spawn(Position);
+	}
+
 	void CheckCollision(Entity* e);
 	void MakeCollision(Entity* _en) override;
 	// thay đổi vận tốc và animation đựa theo hướng bay
@@ -32,7 +39,6 @@ public:
 	void Draw() override;
 	void Draw(D3DXVECTOR2 offset);
 
-	void addExpolostion(Explosion* e);
-	void SetShotTank(Entity* e) { shotTank = e; }
+	void Shoot(D3DXVECTOR2 pos, Direction dir, EntityType shooterType);
 };
 

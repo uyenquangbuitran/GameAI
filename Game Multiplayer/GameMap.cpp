@@ -22,192 +22,116 @@ void GameMap::LoadMap(char* filePath)
 		_tilesetList.insert(std::pair<int, Sprite*>(i, sprite));
 	}
 
-	_waterList.resize(64);
-	_brickList.resize(64);
-	_brickNorList.resize(64);
-
 	// duyệt các layer của map
 	for (int i = 0; i < _map->GetNumTileLayers(); i++)
 	{	
 		const Tmx::TileLayer *layer = _map->GetTileLayer(i);
 		if (layer->GetName() == "Brick" || 
 			layer->GetName() == "Metal Brick" || 
-			layer->GetName() == "Water" || 
+			layer->GetName() == "Water" ||
+			layer->GetName() == "NPCEagle" ||
+			layer->GetName() == "PlayerEagle" ||
 			layer->GetName() == "Tile Layer 1") 
 		{
-			/*for (int j = 0; j < _map->GetNumTilesets(); j++)
+			int tileWidth = _map->GetTileWidth();
+			int tileHeight = _map->GetTileHeight();
+
+			for (int m = 0; m < layer->GetHeight(); m++)
 			{
-				const Tmx::Tileset *tileSet = _map->GetTileset(j);*/
-
-				int tileWidth = _map->GetTileWidth();
-				int tileHeight = _map->GetTileHeight();
-
-				for (int m = 0; m < layer->GetHeight(); m++)
+				for (int n = 0; n < layer->GetWidth(); n++)
 				{
-					for (int n = 0; n < layer->GetWidth(); n++)
+					if (layer->GetTileTilesetIndex(n, m) != -1)
 					{
-						if (layer->GetTileTilesetIndex(n, m) != -1)
+						// tọa độ object
+						D3DXVECTOR2 pos((float)(n * tileWidth + tileWidth / 2),
+							(float)(m * tileHeight + tileHeight / 2));
+
+						// khởi tạo brick
+						Brick* brick;
+						if (layer->GetName() == "Brick")
 						{
-							// tọa độ object
-							D3DXVECTOR2 pos((float)(n * tileWidth + tileWidth / 2), 
-								(float)(m * tileHeight + tileHeight / 2));
-
-							int listId = n / 15 + m / 15 * MAX_LEVEL2_TILE;
-
-							// khởi tạo brick
-							Brick* brick;
-							if (layer->GetName() == "Brick")
-							{
-								brick = new BrickNormal(pos);
-								_brickNorList[listId].push_back((BrickNormal*)brick);
-
-								int _x = int(pos.x / float(X_STEP)), _y = int(pos.y / float(Y_STEP));
-								gridMapLv3[_x][_y] = new MapTileLv3(_x, _y);
-								gridMapLv3[_x][_y]->SetType(NormalBrick);
-								gridMapLv3[_x][_y]->SetCost(NormalBrick);
-								/*int id = _x + _y * (WIDTH / X_STEP);								
-								obstaclesNodes.insert(id);*/
-							}
-							else if (layer->GetName() == "Metal Brick")
-							{
-								brick = new MetalBrick(pos);
-
-								int _x = int(pos.x / float(X_STEP)), _y = int(pos.y / float(Y_STEP));
-								gridMapLv3[_x][_y] = new MapTileLv3(_x, _y);
-								gridMapLv3[_x][_y]->SetType(Metal);
-								gridMapLv3[_x][_y]->SetCost(Metal);
-								int id = _x + _y * (MAP_WIDTH / X_STEP);								
-								obstaclesNodes.insert(id);
-							}
-							else if (layer->GetName() == "Water")
-							{
-								brick = new Water(pos);
-								_waterList[listId].push_back((Water*)brick);
-
-								int _x = int(pos.x / float(X_STEP)), _y = int(pos.y / float(Y_STEP));
-								gridMapLv3[_x][_y] = new MapTileLv3(_x, _y);
-								gridMapLv3[_x][_y]->SetType(WaterBrick);
-								gridMapLv3[_x][_y]->SetCost(WaterBrick);
-								int id = _x + _y * (MAP_WIDTH / X_STEP);
-								obstaclesNodes.insert(id);
-							}
-							else if (layer->GetName() == "Tile Layer 1")
-							{
-								brick = new Boundary(pos);
-
-								int _x = int(pos.x / float(X_STEP)), _y = int(pos.y / float(Y_STEP));
-								gridMapLv3[_x][_y] = new MapTileLv3(_x, _y);
-								gridMapLv3[_x][_y]->SetType(Border);
-								gridMapLv3[_x][_y]->SetCost(Border);
-								int id = _x + _y * (MAP_WIDTH / X_STEP);
-								obstaclesNodes.insert(id);
-							}
-
-							_brickList[listId].push_back(brick);
+							brick = new BrickNormal(pos);
+							_brickNorList.push_back((BrickNormal*)brick);
+							_brickList.push_back(brick);
+							_bricks[pos.x / X_STEP][pos.y / Y_STEP] = brick;
+						}
+						else if (layer->GetName() == "Metal Brick")
+						{
+							brick = new MetalBrick(pos);
+							_brickList.push_back(brick);
+							_bricks[pos.x / X_STEP][pos.y / Y_STEP] = brick;
+						}
+						else if (layer->GetName() == "Water")
+						{
+							brick = new Water(pos);
+							_brickList.push_back(brick);
+							_bricks[pos.x / X_STEP][pos.y / Y_STEP] = brick;
+						}
+						else if (layer->GetName() == "Tile Layer 1")
+						{
+							brick = new Boundary(pos);
+							_brickList.push_back(brick);
+							_bricks[pos.x / X_STEP][pos.y / Y_STEP] = brick;
+						}
+						else if (layer->GetName() == "PlayerEagle")
+						{
+							_eagleList.push_back(new Eagle(pos));
+						}
+						else if (layer->GetName() == "NPCEagle")
+						{
+							_eagleList.push_back(new Eagle(pos, 0, ET_EagleNPC));
 						}
 					}
 				}
-			/*}*/
+			}
 		}
-	}
-	//end load layer.
+	}		
+}
 
-	//Load grid lv3.
-	const Tmx::ObjectGroup* group = _map->GetObjectGroup(0);
-	vector<Tmx::Object*> objects = group->GetObjects();
+vector<Brick*> GameMap::getBrickListAroundEntity(int posX, int posY)
+{
+	vector<Brick*> resuit;
 
-	//Load gate tile.
-	/*for (int index = 0; index < objects.size(); index++)
+	//quét từ posX - size => posX + size
+	// posY - size => posY + size
+
+	int size = 2;
+
+	int xMin = posX - size < 0 ? 0 : posX - size;
+	int xMax = posX + size > MAP_WIDTH / X_STEP ? MAP_WIDTH / X_STEP : posX + size;
+
+	int yMin = posY - size < 0 ? 0 : posY - size;
+	int yMax = posY + size > MAP_HEIGHT / Y_STEP ? MAP_HEIGHT / Y_STEP : posY + size;
+
+	for (int x = xMin; x < xMax; x++)
 	{
-		int x = objects[index]->GetX() / X_STEP;
-		int y = objects[index]->GetY() / Y_STEP;
-		if (gridMapLv3[x][y] == nullptr)
+		for (int y = yMin; y < yMax; y++)
 		{
-			gridMapLv3[x][y] = new MapTileLv3(x, y);
-			gridMapLv3[x][y]->SetType(Gate);
-			gridMapLv3[x][y]->SetCost(Gate);
-		}
-		else if (objects[index]->GetName() == "BG") { gridMapLv3[x][y]->SetType(BrickGate); }
-		
-		gridMapLv3[x][y]->SetGateInfo(objects[index]->GetType());
-		if (gridMapLv3[x][y]->GetType() == Empty) gridMapLv3[x][y]->SetCost(Empty);
-	}*/
-	//end load gate.
-
-	for (int x = 0; x < MAP_WIDTH / X_STEP; x++)
-	{
-		for (int y = 0; y < MAP_HEIGHT / Y_STEP; y++)
-		{
-			if (gridMapLv3[x][y] == nullptr)
+			if (_bricks[x][y])
 			{
-				gridMapLv3[x][y] = dynamic_cast<MapTileLv3*>(new MapTileLv3(x, y));
-				gridMapLv3[x][y]->SetCost(Empty);
+				if (!_bricks[x][y]->IsDeleted)
+					resuit.push_back(_bricks[x][y]);
 			}
 		}
 	}
-	//end load grid lv3.
+	return resuit;
+}
 
-	//Load grid lv2.
-	objects.clear();
-	group = _map->GetObjectGroup(1);
-	objects = group->GetObjects();
-	for (int index = 0; index < objects.size(); index++)
+void GameMap::DrawInCamera(int posXMin, int posXMax, int posYMin, int posYMax)
+{
+	// vẽ các brick
+	for (int x = posXMin; x <= posXMax; x++)
 	{
-		int x = objects[index]->GetX() * 8 / MAP_WIDTH;
-		int y = objects[index]->GetY() * 8 / MAP_HEIGHT;
-		gridMapLv2[x][y] = new MapTileLv2(x, y);		
-		for (int i = 0; i < 15; i++)
+		for (int y = posYMin; y <= posYMax; y++)
 		{
-			for (int j = 0; j < 15; j++)
+			if (x < MAX_X_TILE && y < MAX_Y_TILE
+				&& x >= 0 && y >= 0)
 			{
-				gridMapLv2[x][y]->AddChildTile(gridMapLv3[i][j]);
-				/*if (gridMapLv3[i + x * 15][j + y * 15]->GetType() == Gate)
-					gridMapLv2[x][y]->AddGateTile(gridMapLv3[i + x * 15][j + y * 15]);*/
+				if (_bricks[x][y])
+					_bricks[x][y]->Draw();
 			}
 		}
-
-		/*if (objects[index]->GetType() != "")
-		{
-			gridMapLv2[x][y]->SetType(Gate);
-			gridMapLv2[x][y]->SetGateInfo(objects[index]->GetType());
-		}*/
 	}
-
-	/*for (int i = 0; i < 15; i++)
-	{
-		GAMELOG("%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d",
-			gridMapLv3[0][i]->GetType(),
-			gridMapLv3[1][i]->GetType(), gridMapLv3[2][i]->GetType(), gridMapLv3[3][i]->GetType(),
-			gridMapLv3[4][i]->GetType(), gridMapLv3[5][i]->GetType(), gridMapLv3[6][i]->GetType(),
-			gridMapLv3[7][i]->GetType(), gridMapLv3[8][i]->GetType(), gridMapLv3[9][i]->GetType(),
-			gridMapLv3[10][i]->GetType(), gridMapLv3[11][i]->GetType(), gridMapLv3[12][i]->GetType(),
-			gridMapLv3[13][i]->GetType(), gridMapLv3[14][i]->GetType(), gridMapLv3[15][i]->GetType(),
-			gridMapLv3[16][i]->GetType(), gridMapLv3[17][i]->GetType(), gridMapLv3[18][i]->GetType(),
-			gridMapLv3[19][i]->GetType(), gridMapLv3[20][i]->GetType(), gridMapLv3[21][i]->GetType(),
-			gridMapLv3[22][i]->GetType(), gridMapLv3[23][i]->GetType(), gridMapLv3[24][i]->GetType(),
-			gridMapLv3[25][i]->GetType(), gridMapLv3[26][i]->GetType(), gridMapLv3[27][i]->GetType(),
-			gridMapLv3[28][i]->GetType(), gridMapLv3[29][i]->GetType());
-	}*/
-
-	//Load grid lv1.	
-	objects.clear();
-	group = _map->GetObjectGroup(2);
-	objects = group->GetObjects();
-	for (int index = 0; index < objects.size(); index++)
-	{
-		int x = objects[index]->GetX() * 2 / MAP_WIDTH;
-		int y = objects[index]->GetY() * 2 / MAP_HEIGHT;
-		gridMapLv1[x][y] = new MapTileLv1(x, y);		
-		for (int i = 0; i < 4; i++)
-		{
-			for (int j = 0; j < 4; j++)
-			{
-				gridMapLv1[x][y]->AddChildTile(gridMapLv2[i][j]);
-				/*if (gridMapLv2[i + x * 4][j + y * 4]->GetType() == Gate)
-					gridMapLv1[x][y]->AddGateTile(gridMapLv2[i + x * 4][j + y * 4]);*/
-			}
-		}
-	}	
 }
 
 void GameMap::Draw()
@@ -269,95 +193,6 @@ void GameMap::Draw()
 					// vị trí để vẽ map lên
 					D3DXVECTOR2 pos(n * tileWidth + tileWidth / 2.f, 
 						m * tileHeight + tileHeight / 2.f);
-
-					// vẽ lên
-					sprite->setPosition(pos);
-					sprite->setRect(sourceRECT);
-					sprite->setCenter(D3DXVECTOR2(tileWidth / 2.f, tileHeight / 2.f));
-					sprite->Draw();
-				}
-			}
-
-		}
-	}
-}
-
-void GameMap::Draw(Camera _camera)
-{
-	D3DXVECTOR2 offset(GameGlobal::Width / 2.f - _camera.Position.x,
-		GameGlobal::Height / 2.f - _camera.Position.y);
-
-	// vẽ các object viên brick
-	for (int i = 0; i < (int)_brickList.size(); i++)
-	{
-		for (int j = 0; j < (int)_brickList[i].size(); j++)
-			_brickList[i][j]->Draw(offset);
-	}
-
-	// vẽ các hình ảnh khác lên
-	for (int i = 0; i < _map->GetNumTileLayers(); i++)
-	{
-		const Tmx::TileLayer *layer = _map->GetTileLayer(i);
-
-		//layer là các viên brick đã khởi tạo => bỏ qua
-		if (layer->GetName() == "Brick" ||
-			layer->GetName() == "Metal Brick" ||
-			layer->GetName() == "Water" ||
-			layer->GetName() == "Tile Layer 1")
-			continue;
-
-		if (!layer->IsVisible())
-		{
-			continue;
-		}
-
-		int tileWidth = _map->GetTileWidth();
-		int tileHeight = _map->GetTileHeight();
-
-		for (int m = 0; m < layer->GetHeight(); m++)
-		{
-			for (int n = 0; n < layer->GetWidth(); n++)
-			{
-				// vị trí để vẽ map lên
-				D3DXVECTOR2 pos(n * tileWidth + tileWidth / 2.f,
-					m * tileHeight + tileHeight / 2.f);
-
-
-
-				pos += offset;
-
-				// check outside camera
-				RECT cameraRect = _camera.getBound();
-				if (!(pos.x - tileWidth / 2.f <= cameraRect.right &&
-					pos.x + tileWidth / 2.f >= cameraRect.left &&
-					pos.y - tileHeight / 2.f <= cameraRect.bottom &&
-					pos.y + tileHeight / 2.f >= cameraRect.top))
-				{
-					continue;
-				}
-
-				int tilesetIndex = layer->GetTileTilesetIndex(n, m);
-
-				if (tilesetIndex != -1)
-				{
-					const Tmx::Tileset *tileSet = _map->GetTileset(tilesetIndex);
-
-					int tileSetWidth = tileSet->GetImage()->GetWidth() / tileWidth;
-					int tileSetHeight = tileSet->GetImage()->GetHeight() / tileHeight;
-
-					Sprite* sprite = _tilesetList[layer->GetTileTilesetIndex(n, m)];
-
-					//tile index
-					int tileID = layer->GetTileId(n, m);
-					int y = tileID / tileSetWidth;
-					int x = tileID - y * tileSetWidth;
-
-					// xác định hcn trong hình ảnh gốc
-					RECT sourceRECT;
-					sourceRECT.top = y * tileHeight;
-					sourceRECT.bottom = sourceRECT.top + tileHeight;
-					sourceRECT.left = x * tileWidth;
-					sourceRECT.right = sourceRECT.left + tileWidth;
 
 					// vẽ lên
 					sprite->setPosition(pos);

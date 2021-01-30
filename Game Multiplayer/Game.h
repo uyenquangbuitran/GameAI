@@ -6,11 +6,13 @@
 #include <dinput.h>
 #include "GameTime.h"
 #include <thread>
+#include "GraphicsDevice.h"
 
 class Game
 {
 public:
-	Game();
+	//Game();
+	Game(GraphicsDevice* gDevice);
 	~Game() {}
 
 private:

@@ -22,7 +22,7 @@ public:
 	void SetVec(int x, int y) { vec.set(x, y); }
 	Vector2D GetVec() { return vec; }
 	void Draw();
-	void Draw(D3DXVECTOR2 offset);
+	TileType GetType() { return type; };
 	void SetType(TileType type);
 	void SetPosition(D3DXVECTOR2 position) { this->position = position; }
 	D3DXVECTOR2 GetPosition() { return position; }

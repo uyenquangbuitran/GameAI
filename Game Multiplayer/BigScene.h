@@ -1,55 +1,74 @@
 #pragma once
 #include <array>
-#include <vector>
-#include <unordered_map>
+
+#include "GridTile.h"
+
+
 #include "Scene.h"
-
-#include "GameDefine.h"
-#include "SpriteList.h"
-#include "GameGlobal.h"
-#include "GameLog.h"
-
-#include "GraphNode.h"
-#include "PairNodes.h"
-
-#include "Player.h"
-#include "NPC.h"
-#include "Bullet.h"
-
 #include "GameMap.h"
+#include "Player.h"
+#include "Bullet.h"
+#include "NPC.h"
+#include "NPCGuard.h"
+#include "NPCHunter.h"
+#include "NPCTanker.h"
+#include "PlayerHunter.h"
+#include "PlayerGuard.h"
+#include "Explosion.h"
+#include "ProtectItem.h"
+#include "UpgradeItem.h"
+#include "HealItem.h"
+#include "Water.h"
 #include "Camera.h"
+#include "Astar.h"
 
 class BigScene : public Scene
 {
-	GameMap* _map;	
-	std::array<std::array<GridTile*, (MAP_HEIGHT / Y_STEP)>, (MAP_WIDTH / X_STEP)> gridMap;
-	std::vector<NPC*> _npcList;
-	//std::vector<vector<Bullet*>> _bulletList;
-	std::vector<Bullet*> _bulletList;
-	std::set<int, std::greater <int>> tankNodes;
+	Camera* camera;
 
-	Camera camera;
-	D3DXVECTOR2 cameraOffset;
-
+	GameMap* _map;
 	Player* _player;
-	bool _isPlayerMoving = false;
-	bool _isMouseActive = true;
 
-	void UpdateTankNodes();
-	void FindPlayerPath(Node begin, Node destination);
-	void FindPath(Node begin, Node destination);	
+	vector<NPC*> _npcList;
+	vector<NPC*> _playerList;
+
+	vector<Bullet*> _bulletList;
+	vector<Explosion*> _smallExList;
+	vector<Explosion*> _bigExplosionList;
+
+	vector<Eagle*> eagleList;
+	vector<Eagle*> eagleNPCList;
+	vector<Eagle*> eaglePlayerList;
+
+	Eagle* npcEagle;
+	Eagle* playerEagle;
+
+	float _timeSpawnProtect;
+	float _timeSpawnHeal;
+	vector<ProtectItem*> _protectItemList;
+	vector<HealItem*> _healItemList;
+
+	const int MAX_PLAYER_GUARD = 2;
+	const int MAX_PLAYER_HUNTER = 7;
+
+	const int MAX_NPC_HUNTER = 12;
+	const int MAX_NPC_TANKER = 12;
+	const int MAX_NPC_GUARD = 2;
+
+	const int MAX_SHIELD_ITEM = 20;
+	const int MAX_HEAL_ITEM = 20;
+
+	Water* _waterBrick;
 
 public:
+	void InitCamera(GraphicsDevice* gDevice);
+
+	std::array<std::array<GridTile*, MAX_Y_TILE>, MAX_X_TILE> mapGrid;
+
 	BigScene();
-	~BigScene() {};
-
-	void Update(float dt) override;
+	~BigScene() {}
+	void Update(float _dt) override;
 	void Draw() override;
-
-	void OnLeftMouseDown(float x, float y) override;
-	void OnRightMouseDown(float x, float y) override;
-
-	bool IsValidClickPosition(int x, int y) { return _map->IsValidTile(x, y); }
-
-	Bullet* GetBullet();
+	bool RandomGridTileMove(GridTile *grid);
 };
+

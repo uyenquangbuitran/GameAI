@@ -14,44 +14,40 @@ void GridTile::Draw()
 	anim->Draw(position, D3DXVECTOR2(0.f, 0.f), false, false, color);
 }
 
-void GridTile::Draw(D3DXVECTOR2 offset)
-{
-	anim->Draw(position, offset, false, false, color);
-}
-
 void GridTile::SetType(TileType type)
 {
 	this->type = type;
 	switch (type)
 	{
 	case Empty:
-		color = D3DCOLOR_XRGB(0, 0, 0); // black
+		color = D3DCOLOR_XRGB(0, 0, 0);
 		break;
 	case Opened:
-		color = D3DCOLOR_XRGB(255, 255, 255); // white
+		color = D3DCOLOR_XRGB(255, 255, 255);
 		break;
 	case Closed:
-		color = D3DCOLOR_XRGB(128, 128, 128); // grey
+		color = D3DCOLOR_XRGB(128, 128, 128);
 		break;
 	case Obstacle:
-		color = D3DCOLOR_XRGB(255, 0, 255); // purple
+		color = D3DCOLOR_XRGB(255, 0, 255);
 		break;
 	case Moving:
-		color = D3DCOLOR_XRGB(255, 255, 0); // yellow
+		color = D3DCOLOR_XRGB(255, 180, 0);
 		break;
 	case Begin:
-		color = D3DCOLOR_XRGB(0, 0, 255); // blue
+		color = D3DCOLOR_XRGB(0, 0, 255);
 		break;
 	case Destination:
-		color = D3DCOLOR_XRGB(255, 0, 0); // red
+		color = D3DCOLOR_XRGB(0, 0, 0);
 		break;
 	case Path:
-		color = D3DCOLOR_XRGB(0, 255, 0); // green
+		color = D3DCOLOR_XRGB(0, 255, 0);
 		break;
-	case Debug0:
-		color = D3DCOLOR_XRGB(0, 128, 0); // green
+	case Path_Dodging:
+		color = D3DCOLOR_XRGB(128, 128, 128);
 		break;
-	case Debug1:
-		color = D3DCOLOR_XRGB(128, 128, 0); // yellow
+	case Path_Attacking:
+		color = D3DCOLOR_XRGB(255, 255, 0);
+		break;
 	}
 }

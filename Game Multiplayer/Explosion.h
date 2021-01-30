@@ -59,10 +59,14 @@ public:
 
 	void Draw()
 	{
-		if (IsDeleted)
-			return;
-
+		if (IsDeleted) return;
 		_animation->Draw(Position);
+	}
+
+	void Draw(D3DXVECTOR2 offset)
+	{
+		if (IsDeleted) return;
+		_animation->Draw(Position, offset);
 	}
 
 	void Spawn(D3DXVECTOR2 position)

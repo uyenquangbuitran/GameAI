@@ -31,6 +31,15 @@ Player::Player()
 	default:
 		break;
 	}
+
+	for (int i = 0; i < 6; i++)
+	{
+		Bullet* bullet = new Bullet();
+		_bulletList.emplace_back(bullet);
+	}
+	_isShield = false;
+	_hp = 10;
+	_maxHP = 10;
 }
 
 void Player::Update(float _dt)
@@ -44,7 +53,19 @@ void Player::Update(float _dt)
 	Position += Velocity * _dt;
 
 	if (_isShield)
+	{
 		_shieldAnimation->Update(_dt);
+
+		_shieldAnimation->Update(_dt);
+
+		_shieldedTime += _dt;
+		if (_shieldedTime > SHIELD_TIME_MAX)
+		{
+			_isShield = false;
+			_shieldedTime = 0;
+		}
+	}
+		
 }
 
 void Player::HandleKeyboard(std::map<int, bool> keys, float _dt)
@@ -56,28 +77,37 @@ void Player::HandleKeyboard(std::map<int, bool> keys, float _dt)
 	{
 		_count_Shoot -= _dt;
 	}
-	if (_count_Shoot < 0 && keys[VK_SPACE]) // gửi data bắn đạn
+	if (_count_Shoot < 0 && keys[VK_SPACE]) // Shoot
 	{
 		_count_Shoot += _time_BetweenShoots;
 		
-		// shoot
+		if (!_bulletList.empty() && _shotDirection != D_Stand)
+		{
+			if (_currentBullet >= _bulletList.size()) _currentBullet = 0;
+			_bulletList.at(_currentBullet)->Shoot(Position, _shotDirection, ET_Player);
+			_currentBullet++;
+		}
 	}
 
 	if (keys[VK_LEFT])
 	{
 		_direction = D_Left;
+		_shotDirection = D_Left;
 	}
 	else if (keys[VK_RIGHT])
 	{
 		_direction = D_Right;
+		_shotDirection = D_Right;
 	}
 	else if (keys[VK_UP])
 	{
 		_direction = D_Up;
+		_shotDirection = D_Up;
 	}
 	else if (keys[VK_DOWN])
 	{
 		_direction = D_Down;
+		_shotDirection = D_Down;
 	}
 	else
 	{
@@ -97,7 +127,7 @@ void Player::MovePath(float dt)
 		if (_waittingTime > 2.f)
 		{
 			_waittingTime = 0;
-			//RunDodging();
+			RunDodging();
 			return;
 		}
 		return;
@@ -107,18 +137,18 @@ void Player::MovePath(float dt)
 	{
 		if (currentNodeIndex >= path.size())
 		{
-			//RunAStar();
+			RunAStar();
 		}
 		else
 		{
 			Move(path[currentNodeIndex]->GetPosition());
 			if (!_isMoving)
 			{
-				AStar::GetInstance()->SetTileValue(path[currentNodeIndex]->GetVec().x,
+				AStar::getInstance()->SetValue(path[currentNodeIndex]->GetVec().x,
 					path[currentNodeIndex]->GetVec().y, 0);
 				currentNodeIndex++;
 				if (currentNodeIndex < path.size())
-					AStar::GetInstance()->SetTileValue(path[currentNodeIndex]->GetVec().x,
+					AStar::getInstance()->SetValue(path[currentNodeIndex]->GetVec().x,
 						path[currentNodeIndex]->GetVec().y, ASTAR_VALUE_PLAYER);
 			}
 		}
@@ -169,6 +199,90 @@ void Player::Move(D3DXVECTOR2 destination)
 	ApplyVelocity();
 }
 
+void Player::RunAStar()
+{	
+	_isRunningAStar = true;
+	if (!_isDodging)
+	{
+		if (!path.empty())
+		{
+			if (currentNodeIndex >= path.size())
+			{
+				if (path.at(path.size() - 1)->GetVec().x == _lastDestPos->x
+					&& path.at(path.size() - 1)->GetVec().y == _lastDestPos->y)
+				{
+					RunRandom();
+				}
+				else PathAStar(_lastDestPos->x, _lastDestPos->y);
+			}
+		}
+		else RunRandom();
+	}
+	else
+	{
+		_isDodging = false;
+		PathAStar(_lastDestPos->x, _lastDestPos->y);
+	}
+	_isRunningAStar = false;
+}
+
+void Player::RunRandom()
+{
+	Vector2D* pos = new Vector2D();
+	if (AStar::getInstance()->RamdomValidPosition(pos)) PathAStar(pos->x, pos->y);
+}
+
+void Player::RunDodging()
+{
+	Stop();
+	Vector2D* pos = new Vector2D();
+	Vector2D pos0;
+	pos0.x = Position.x / X_STEP;
+	pos0.y = Position.y / Y_STEP;
+
+	if (_isCollision)
+	{
+		Vector2D* posTemp = new Vector2D();
+		if (AStar::getInstance()->RandomValidPosAround(pos0, posTemp, 1))
+			SetPosition((float)(pos->x + 0.5f) * X_STEP, (float)(pos->y + 0.5f) * Y_STEP);
+	}
+
+	if (AStar::getInstance()->RandomValidPosAround(pos0, pos, 3))
+	{
+		_isDodging = true;
+		_isRunningAStar = false;
+		PathAStar(pos->x, pos->y);
+	}
+}
+
+void Player::PathAStar(int posX, int posY)
+{
+	currentNodeIndex = 0;
+
+	Node beginNode;
+	beginNode.SetX(Position.x / X_STEP);
+	beginNode.SetY(Position.y / Y_STEP);
+	Node destNode;
+	destNode.SetX(posX);
+	destNode.SetY(posY);
+
+	if (_isRunningAStar)
+	{
+		_lastDestPos->x = posX;
+		_lastDestPos->y = posY;
+	}
+
+	AstarResult resuit = AStar::getInstance()->findPathV2(beginNode, destNode);
+
+	path.clear();
+	if (!resuit.path.empty())
+		for (auto node : resuit.path)
+		{
+			path.push_back(AStar::getInstance()->mapGrid[node.GetX()][node.GetY()]);
+		}
+	_isMoving = true;
+}
+
 void Player::Stop()
 {
 	_direction = D_Stand;
@@ -177,13 +291,11 @@ void Player::Stop()
 	ApplyVelocity();
 }
 
-void Player::Pause(float delayAmount)
+void Player::SetPosition(float x, float y)
 {
-	pauseTime = delayAmount;
-	_direction = D_Stand;
-	_isMoving = false;
-	_isPausing = true;
-	ApplyVelocity();
+	Position = D3DXVECTOR2(x, y);
+
+	AStar::getInstance()->SetValue(x / X_STEP, y / Y_STEP, ASTAR_VALUE_PLAYER);
 }
 
 void Player::SetAnimation(Direction direction)
@@ -402,8 +514,16 @@ void Player::DrawArrow()
 
 void Player::CheckCollision(Entity * entity)
 {
-	if (IsDeleted)
-		return;
+	if (entity->IsDeleted) return;
+
+	if (!CanCollision(entity)) return;
+
+	for (auto bullet : _bulletList)
+	{
+		bullet->CheckCollision(entity);
+	}
+
+	if (IsDeleted) return;
 
 	CollisionResult cR = GameCollision::getCollisionResult(this, entity);
 	if (cR.IsCollided)
@@ -423,6 +543,18 @@ void Player::CheckCollision(Entity * entity)
 		else if (cR.Side == CS_Bottom)
 		{
 			Position.y -= (float)(cR.Rect.bottom - cR.Rect.top) - 1;
+		}
+
+		if (entity->getType() == ET_ProtectItem)
+		{
+			_isShield = true;
+			entity->IsDeleted = true;
+		}
+		else if (entity->getType() == ET_HealItem)
+		{
+			_hp += entity->_hp;
+			if (_hp > _maxHP) _hp = _maxHP;
+			entity->IsDeleted = true;
 		}
 	}
 }

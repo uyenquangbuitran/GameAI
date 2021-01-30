@@ -135,7 +135,6 @@
   <ItemGroup>
     <ClInclude Include="Animation.h" />
     <ClInclude Include="AStar.h" />
-    <ClInclude Include="BattleScene.h" />
     <ClInclude Include="BigScene.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Eagle.h" />
@@ -155,9 +154,9 @@
     <ClInclude Include="GameTime.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GraphNode.h" />
-    <ClInclude Include="GridScene.h" />
     <ClInclude Include="GridTile.h" />
-    <ClInclude Include="HorizontalFieldScene.h" />
+    <ClInclude Include="GraphicsDevice.h" />
+    <ClInclude Include="HealItem.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="Label.h" />
     <ClInclude Include="MapReader\base64.h" />
@@ -186,10 +185,14 @@
     <ClInclude Include="MapTile.h" />
     <ClInclude Include="MetalBrick.h" />
     <ClInclude Include="NPC.h" />
+    <ClInclude Include="NPCGuard.h" />
     <ClInclude Include="NPCDecisionMaker.h" />
+    <ClInclude Include="NPCHunter.h" />
+    <ClInclude Include="NPCTanker.h" />
     <ClInclude Include="PairNodes.h" />
-    <ClInclude Include="PairTile.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="PlayerGuard.h" />
+    <ClInclude Include="PlayerHunter.h" />
     <ClInclude Include="Pointed.h" />
     <ClInclude Include="ProtectItem.h" />
     <ClInclude Include="QuadTree.h" />
@@ -206,9 +209,9 @@
   <ItemGroup>
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="AStar.cpp" />
-    <ClCompile Include="BattleScene.cpp" />
     <ClCompile Include="BigScene.cpp" />
     <ClCompile Include="Bullet.cpp" />
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="GameCollision.cpp" />
     <ClCompile Include="GameDebugDraw.cpp" />
@@ -218,9 +221,7 @@
     <ClCompile Include="GameTime.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GraphNode.cpp" />
-    <ClCompile Include="GridScene.cpp" />
     <ClCompile Include="GridTile.cpp" />
-    <ClCompile Include="HorizontalFieldScene.cpp" />
     <ClCompile Include="Label.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MapReader\base64.cpp" />

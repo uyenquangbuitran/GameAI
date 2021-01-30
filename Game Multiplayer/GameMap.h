@@ -13,6 +13,7 @@
 #include "MetalBrick.h"
 #include "Water.h"
 #include "Boundary.h"
+#include "Eagle.h"
 #include "GameCollision.h"
 #include "GameDebugDraw.h"
 #include "QuadTree.h"
@@ -20,17 +21,14 @@
 #include "MapTile.h"
 
 class GameMap
-{
-	const int MAX_LEVEL2_TILE = 8;	
+{	
+	std::array < std::array<Brick*, MAP_HEIGHT / Y_STEP>, MAP_WIDTH / X_STEP> _bricks;
+	//std::array < std::array<Grass*, MAP_HEIGHT / Y_STEP>>, MAP_WIDTH / X_STEP > _grassies;
 
-	std::vector<std::vector<Water*>> _waterList;
-	std::vector<std::vector<Brick*>> _brickList;
-	std::vector<std::vector<BrickNormal*>> _brickNorList;
-
-	std::array<std::array<MapTileLv1*, LEVEL1_HEIGHT>, LEVEL1_WIDTH> gridMapLv1;
-	std::array<std::array<MapTileLv2*, LEVEL2_HEIGHT>, LEVEL2_WIDTH> gridMapLv2;
-	std::array<std::array<MapTileLv3*, LEVEL3_HEIGHT * LEVEL2_HEIGHT>,
-										LEVEL3_WIDTH * LEVEL2_WIDTH> gridMapLv3;
+	std::vector<Brick*> _brickList;
+	std::vector<BrickNormal*> _brickNorList;
+	std::vector<Eagle*> _eagleList;
+	//std::vector<Grass*> _grassList;
 
 	Tmx::Map *_map;
 	std::map<int, Sprite*>  _tilesetList;
@@ -43,23 +41,19 @@ class GameMap
 	int getTileHeight() { return _map->GetTileHeight(); }
 
 public:
-	std::set<int, std::greater <int>> obstaclesNodes;
-	std::set<int, std::greater <int>> normalBrickNodes;
 
 	GameMap(char* filePath);
 	~GameMap() {}	
 
 	Tmx::Map* getMap() { return _map; }
-	std::vector<Brick*> getBrickList(int index) { return _brickList[index]; }
-	std::vector<BrickNormal*> getBrickNorList(int index) { return _brickNorList[index]; }
+	std::vector<Brick*> getBrickList() { return _brickList; }
+	std::vector<BrickNormal*> getBrickNorList() { return _brickNorList; }
+	std::vector<Eagle*> getEagleList() { return _eagleList; }
 
-	MapTileLv1* getMapTileLv1(int x, int y) { return gridMapLv1[x][y]; }
-	MapTileLv2* getMapTileLv2(int x, int y) { return gridMapLv2[x][y]; }
-	MapTileLv3* getMapTileLv3(int x, int y) { return gridMapLv3[x][y]; }
+	std::vector<Brick*> getBrickListAroundEntity(int posX, int posY);
 
-	bool IsValidTile(int x, int y) { return gridMapLv3[x][y]->GetCost() == -1; }
+	void DrawInCamera(int posXMin, int posXMax, int posYMin, int posYMax);
 
 	void Draw();
-	void Draw(Camera _camera);	
 };
 

@@ -62,5 +62,36 @@ public:
 			_animation->Draw(Position);
 		}
 	}
+
+	void Draw(D3DXVECTOR2 offset)
+	{
+		if (IsDeleted) return;
+
+		// nếu còn 1.5 giây tồn tại, vẽ nhấp nháy
+		if (_existTime - _count_existTime < 1.5f)
+		{
+			_flashingTime++;
+			if (_flashingTime > 5)
+			{
+				_animation->Draw(Position, offset);
+				//flashingTime = 0;
+			}
+			if (_flashingTime == 10)
+			{
+				_flashingTime = 0;
+			}
+		}
+		else
+		{
+			_animation->Draw(Position, offset);
+		}
+	}
+
+	void SetPosition(float x, float y)
+	{
+		Position = D3DXVECTOR2(x, y);
+
+		AStar::getInstance()->SetValue(x / X_STEP, y / Y_STEP, ASTAR_VALUE_ITEM);
+	}
 };
 
